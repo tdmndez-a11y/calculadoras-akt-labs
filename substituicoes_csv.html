@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lista de Substituições — TACO (CSV) | AKT Labs</title>
+  <style>
+    :root{ --bg:#0b0c10; --card:#13151a; --ink:#e8edf2; --muted:#a7b0bd; --accent:#f97316; --accent-2:#fb923c; --line:#1f2733; --shade:#0f141c; --radius:16px; --ok:#34d399; --warn:#ef4444; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%);color:var(--ink)}
+    .wrap{max-width:1200px;margin:40px auto;padding:0 16px}
+    header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    .logo{width:42px;height:42px;border-radius:12px;overflow:hidden}
+    .logo img{width:42px;height:42px;object-fit:contain}
+    h1{margin:0;font-size: clamp(20px,2.4vw,32px)}
+    .sub{color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+    @media (max-width:1100px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,#151922 0%, #10141c 100%);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 12px;font-size:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:860px){.row{grid-template-columns:1fr}}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #273040;background:var(--shade);color:var(--ink);outline:none}
+    input:focus,select:focus{border-color:var(--accent)}
+    .kpi{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;background:#0e1522;border:1px solid #1f2a3c;margin-bottom:10px}
+    .kpi .v{font-size:18px;font-weight:800}
+    .tiny{font-size:11px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+    th{background:#0f1524;color:#d7e0ea}
+    tr:nth-child(even){background:#0e1320}
+    .badge{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid #2a3548;background:#0f141c;color:#cbd5e1}
+    .score{font-weight:800}
+    .ac{position:relative}
+    .ac-list{position:absolute;left:0;right:0;top:100%;z-index:20;background:#0f141c;border:1px solid #273040;border-radius:12px;margin-top:6px;box-shadow:0 12px 30px rgba(0,0,0,.35);max-height:260px;overflow:auto}
+    .ac-item{padding:10px 12px;display:flex;justify-content:space-between;gap:10px;cursor:pointer}
+    .ac-item:hover{background:#111a28}
+    .ac-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ac-src{font-size:11px;color:#a7b0bd}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo"><img src="Logo fundo branco 01 (1) (1).png" alt="AKT Logo" onerror="this.style.display='none'"/></div>
+      <div>
+        <h1>Lista de Substituições — TACO (CSV)</h1>
+        <div class="sub">Carrega automaticamente o arquivo <code>foods.csv</code> (na mesma pasta). Critério: <b>macro predominante</b> por grupo. Visualização: <b>ranking por semelhança</b>.</div>
+      </div>
+    </header>
+
+    <div class="kpi"><div>Total de itens carregados</div><div class="v" id="count">0</div></div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Seleção do alimento base</h2>
+        <div class="row">
+          <div>
+            <label for="group">Grupo alimentar</label>
+            <select id="group">
+              <option value="proteinas" selected>Proteínas</option>
+              <option value="carboidratos">Carboidratos</option>
+              <option value="gorduras">Gorduras</option>
+              <option value="laticinios">Laticínios</option>
+              <option value="leguminosas">Leguminosas</option>
+              <option value="frutas">Frutas</option>
+              <option value="vegetais">Vegetais</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="ac">
+            <label for="search">Pesquisar alimento (ignora acentos)</label>
+            <input id="search" type="text" placeholder="ex.: frango grelhado, arroz, tilapia, ovo...">
+            <div id="acList" class="ac-list" style="display:none"></div>
+          </div>
+          <div>
+            <label for="serving">Porção de referência (g)</label>
+            <input id="serving" type="number" min="10" max="1000" step="1" value="100">
+          </div>
+        </div>
+        <div class="tiny">Macro igualado por grupo: <b>Proteínas→P</b> · <b>Carboidratos/Frutas/Leguminosas/Vegetais→C</b> · <b>Gorduras→G</b> · <b>Laticínios→P+G</b>.</div>
+        <div id="baseInfo" class="kpi"><div>Base:</div><div class="v" id="baseLabel">—</div></div>
+      </section>
+
+      <aside class="card">
+        <h2>Substituições (ranking por semelhança)</h2>
+        <div class="tiny">Porção equivalente = quantidade (g) do substituto para igualar o(s) macro(s) do base na porção de referência.</div>
+        <div style="max-height:520px;overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Alimento</th>
+                <th>Origem</th>
+                <th>Porção eq. (g)</th>
+                <th>P / C / G</th>
+                <th>kcal</th>
+                <th>Desvio</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="results"></tbody>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const $ = (q)=>document.querySelector(q);
+    let DATA = []; // {id,nome,origem,grupo,P,C,G,kcal}
+
+    const norm = (s)=> (s||'').toString().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+
+    async function loadCSV() {
+      // Fetch foods.csv from same folder and parse
+      const res = await fetch('foods.csv', {cache:'no-store'});
+      const txt = await res.text();
+      DATA = parseCSV(txt);
+      updateCount();
+    }
+
+    function parseCSV(txt){
+      const lines = txt.split(/\\r?\\n/).filter(l=>l.trim().length>0);
+      if(!lines.length) return [];
+      const head = lines[0].split(',').map(s=>s.trim());
+      const idx = (k)=> head.findIndex(h=> norm(h)===norm(k));
+      const iNome = idx('nome'), iKcal = idx('kcal'), iP = idx('P'), iC = idx('C'), iG = idx('G'), iGrupo = idx('grupo');
+      const out = [];
+      for(let i=1;i<lines.length;i++){
+        const cols = splitCSVLine(lines[i]);
+        const nome = cols[iNome]||'';
+        if(!nome) continue;
+        const rec = {
+          id: `taco_${i.toString().padStart(5,'0')}`,
+          nome: nome.trim(),
+          origem: 'taco',
+          grupo: (cols[iGrupo]||'').trim() || inferGroup(nome),
+          P: parseNum(cols[iP]),
+          C: parseNum(cols[iC]),
+          G: parseNum(cols[iG]),
+          kcal: parseNum(cols[iKcal])
+        };
+        if(Number.isFinite(rec.kcal)) out.push(rec);
+      }
+      return out;
+    }
+    function splitCSVLine(line){
+      const out=[]; let cur=''; let q=false;
+      for(let i=0;i<line.length;i++){
+        const c=line[i];
+        if(c==='\"'){ q=!q; continue; }
+        if(c===',' && !q){ out.push(cur); cur=''; } else { cur+=c; }
+      }
+      out.push(cur);
+      return out.map(s=>s.trim());
+    }
+    function parseNum(s){
+      if(s==null) return 0;
+      s = (s+'').replace(',','.');
+      const v = parseFloat(s.replace(/[^0-9\\.-]/g,''));
+      return Number.isFinite(v)? v : 0;
+    }
+    function inferGroup(name){
+      const n = norm(name);
+      if(/(carne|frango|peito|bife|porco|suino|sui no|tilapia|tilap|peixe|atum|ov|sardinha|salmao|file mignon|patinho|alcatra|coxao)/.test(n)) return 'proteinas';
+      if(/(azeite|oleo|manteiga|margarina|banha|gordura)/.test(n)) return 'gorduras';
+      if(/(leite|queijo|iogurte|requeij|kefir|whey)/.test(n)) return 'laticinios';
+      if(/(feij|lentilh|grao de bico|gr ao de bico|ervilha|soja|amendoim|graos|gr aos)/.test(n)) return 'leguminosas';
+      if(/(banana|maca|ma ca|laranja|uva|abacaxi|mamao|mam ao|manga|pera|kiwi|morango|fruta)/.test(n)) return 'frutas';
+      if(/(alface|couve|brocol|br ocol|tomate|cenoura|abobrinha|pepino|berinj|alho poro|alho-por o|piment|espinafre|verdura|legume)/.test(n)) return 'vegetais';
+      return 'carboidratos';
+    }
+    function pickMacroKey(group){
+      if(group==='proteinas') return ['P'];
+      if(group==='gorduras') return ['G'];
+      if(group==='laticinios') return ['P','G'];
+      if(group==='carboidratos' || group==='frutas' || group==='leguminosas' || group==='vegetais') return ['C'];
+      return ['P'];
+    }
+    function updateCount(){ $('#count').textContent = DATA.length.toLocaleString('pt-BR'); }
+
+    function searchItems(db, q, group){
+      const s = norm(q||'');
+      const items = db.filter(x=> x.grupo===group);
+      if(!s) return items.slice(0,50);
+      return items.map(x=>({x, n: norm(x.nome)}))
+                  .filter(o=> o.n.includes(s))
+                  .sort((a,b)=> a.n.indexOf(s) - b.n.indexOf(s))
+                  .map(o=> o.x);
+    }
+
+    function macrosPerPortion(food, grams){
+      const f = grams/100; return { P: food.P*f, C: food.C*f, G: food.G*f, kcal: food.kcal*f };
+    }
+    function gramsToMatch(baseFood, candFood, group, refG){
+      const keys = pickMacroKey(group);
+      const base = macrosPerPortion(baseFood, refG);
+      let targetGrams = 100;
+      if(keys.length===1){
+        const k = keys[0]; const denom = candFood[k]; if(denom<=0) return null;
+        targetGrams = base[k]/(candFood[k]/100);
+      } else {
+        let acc=0, n=0; for(const k of keys){ if(candFood[k]>0){ acc += base[k]/(candFood[k]/100); n++; } }
+        if(n===0) return null; targetGrams = acc/n;
+      }
+      return Math.max(5, Math.min(800, targetGrams));
+    }
+    function similarityScore(baseM, candM, keys){
+      const all = ['P','C','G']; let err=0, wsum=0;
+      for(const k of all){
+        const w = keys.includes(k)?3:1; const a = baseM[k]; const b = candM[k];
+        const rel = a>0? Math.abs(a-b)/a : Math.abs(a-b)/(b+1e-9);
+        err += w*Math.min(rel,2); wsum += w;
+      }
+      const e = err/wsum; return Math.max(0, Math.round((1 - Math.min(e,1))*100));
+    }
+
+    // Autocomplete
+    function renderAcList(list){
+      const box = $('#acList'); box.innerHTML='';
+      if(!list.length){ box.style.display='none'; return; }
+      list.slice(0,12).forEach(item=>{
+        const div = document.createElement('div'); div.className='ac-item';
+        div.innerHTML = `<span class="ac-name">${item.nome}</span><span class="ac-src">TACO</span>`;
+        div.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectBase(item); });
+        box.appendChild(div);
+      });
+      box.style.display='block';
+    }
+    let baseFood = null;
+    function selectBase(item){
+      baseFood = item; $('#search').value = item.nome; $('#acList').style.display='none';
+      $('#baseLabel').textContent = `${item.nome} · TACO · ${$('#serving').value} g`;
+      computeAndRender();
+    }
+    $('#search').addEventListener('input', () => {
+      const group = $('#group').value; const q = $('#search').value;
+      const list = searchItems(DATA, q, group);
+      renderAcList(list);
+    });
+    $('#search').addEventListener('blur', ()=> setTimeout(()=> $('#acList').style.display='none', 150));
+    $('#search').addEventListener('keydown', (e)=>{
+      if(e.key==='Enter'){
+        const group = $('#group').value; const q = $('#search').value;
+        const list = searchItems(DATA, q, group);
+        if(list.length){ selectBase(list[0]); e.preventDefault(); }
+      }
+    });
+    document.getElementById('group').addEventListener('change', ()=> computeAndRender());
+
+    function computeAndRender(){
+      if(!baseFood){ renderResults([]); return; }
+      const group = $('#group').value; const refG = parseFloat($('#serving').value)||100; const keys = pickMacroKey(group);
+      const baseM = macrosPerPortion(baseFood, refG);
+      const pool = DATA.filter(x=> x.grupo===group && x.id!==baseFood.id);
+      const rows = [];
+      for(const cand of pool){
+        const grams = gramsToMatch(baseFood, cand, group, refG); if(!grams) continue;
+        const candM = macrosPerPortion(cand, grams);
+        const score = similarityScore(baseM, candM, keys);
+        const desvio = `${(candM.P-baseM.P).toFixed(1)}/${(candM.C-baseM.C).toFixed(1)}/${(candM.G-baseM.G).toFixed(1)}`;
+        rows.push({cand, grams, candM, score, desvio});
+      }
+      rows.sort((a,b)=> b.score - a.score);
+      renderResults(rows);
+    }
+    function renderResults(rows){
+      const tb = $('#results'); tb.innerHTML='';
+      for(const r of rows){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.cand.nome}</td>
+          <td><span class="badge">TACO</span></td>
+          <td>${r.grams.toFixed(0)}</td>
+          <td>${r.candM.P.toFixed(1)} / ${r.candM.C.toFixed(1)} / ${r.candM.G.toFixed(1)}</td>
+          <td>${r.candM.kcal.toFixed(0)}</td>
+          <td>${r.desvio}</td>
+          <td class="score">${r.score}</td>`;
+        tb.appendChild(tr);
+      }
+      if(rows.length===0){
+        const tr = document.createElement('tr'); tr.innerHTML = '<td colspan="7" class="tiny">Nenhum resultado.</td>'; tb.appendChild(tr);
+      }
+    }
+
+    loadCSV();
+  </script>
+</body>
+</html>
