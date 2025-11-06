@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Cargas — Brzycki | AKT Labs</title>
+  <style>
+    :root{
+      --bg:#0b0c10; --card:#13151a; --ink:#e8edf2; --muted:#a7b0bd; --accent:#f97316; --accent-2:#fb923c; --line:#1f2733; --shade:#0f141c; --radius:16px; --ok:#34d399; --warn:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%);color:var(--ink)}
+    .wrap{max-width:1100px;margin:40px auto;padding:0 16px}
+    header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+    .logo{width:42px;height:42px;border-radius:12px;overflow:hidden}
+    .logo img{width:42px;height:42px;object-fit:contain}
+    h1{margin:0;font-size: clamp(20px,2.4vw,32px)}
+    .sub{color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .card{background:linear-gradient(180deg,#151922 0%, #10141c 100%);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 12px;font-size:18px}
+    .sep{height:1px;background:#1b2331;margin:10px 0}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:780px){.row{grid-template-columns:1fr}}
+
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #273040;background:var(--shade);color:var(--ink);outline:none}
+    input:focus,select:focus{border-color:var(--accent)}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{padding:10px 14px;border-radius:12px;border:1px solid #253044;background:var(--shade);color:var(--ink);cursor:pointer}
+    button.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#071018; border-color:transparent;font-weight:800}
+
+    table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+    th{background:#0f1524;color:#d7e0ea}
+    tr:nth-child(even){background:#0e1320}
+
+    .kpi{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:14px;background:#0e1522;border:1px solid #1f2a3c;margin-bottom:10px}
+    .kpi .v{font-size:22px;font-weight:800}
+    .tiny{font-size:11px;color:#a7b0bd}
+    .ok{color:var(--ok)}
+    .warn{color:var(--warn)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo"><img src="Logo fundo branco 01 (1) (1).png" alt="AKT Logo" onerror="this.style.display='none'"/></div>
+      <div>
+        <h1>Calculadora de Cargas — Brzycki</h1>
+        <div class="sub">Estime 1RM e cargas por % e por repetições usando a equação de Brzycki.</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Entradas</h2>
+        <div class="row">
+          <div>
+            <label for="unit">Unidade</label>
+            <select id="unit"><option value="kg">kg</option><option value="lb">lb</option></select>
+          </div>
+          <div>
+            <label for="rounding">Menor anilha da sua academia</label>
+            <select id="rounding">
+              <option value="0.5">0,5</option>
+              <option value="1">1</option>
+              <option value="2.5" selected>2,5</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="lifted">Carga levantada (unidade)</label>
+            <input id="lifted" type="number" min="1" step="0.5" placeholder="100">
+          </div>
+          <div>
+            <label for="reps">Reps realizadas</label>
+            <input id="reps" type="number" min="1" max="20" step="1" placeholder="6">
+          </div>
+        </div>
+        <div class="tiny">Fórmula de Brzycki: <code>1RM = Peso × 36 / (37 − reps)</code>. Precisão ideal até ~10–12 reps.</div>
+        <div class="actions">
+          <button class="primary" id="calcBtn">Calcular</button>
+          <button id="resetBtn">Limpar</button>
+          <button id="copyBtn">Copiar resumo</button>
+        </div>
+        <div id="msg" class="tiny"></div>
+      </section>
+
+      <aside class="card">
+        <h2>Resultados</h2>
+        <div class="kpi"><div>1RM estimado</div><div class="v" id="oneRM">—</div></div>
+        <div class="kpi"><div>Carga para o alvo</div><div class="v" id="targetLoad">—</div></div>
+        <div class="row">
+          <div>
+            <label for="targetPct">Alvo por % do 1RM</label>
+            <input id="targetPct" type="number" min="30" max="100" step="1" placeholder="80">
+          </div>
+          <div>
+            <label for="targetReps">Alvo por reps</label>
+            <input id="targetReps" type="number" min="1" max="20" step="1" placeholder="5">
+          </div>
+        </div>
+        <div class="tiny">Preencha % ou reps para ver a carga sugerida (usa Brzycki para converter reps→% e vice‑versa).</div>
+        <div class="sep"></div>
+        <h2>Tabela por zonas</h2>
+        <div style="max-height:360px;overflow:auto">
+          <table id="tableZones">
+            <thead><tr><th>% 1RM</th><th>Reps estimadas</th><th>Carga</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const $ = (q)=>document.querySelector(q);
+
+    function roundTo(x, step){ return Math.round(x/step)*step; }
+    function brzycki1RM(w, r){ if(r<=0 || r>=37) return NaN; return w * 36 / (37 - r); }
+    function pctFromReps(r){ return (37 - r)/36; }
+    function repsFromPct(p){ return 37 - 36*p; }
+
+    function fmtLoad(x){ const step=parseFloat($('#rounding').value)||1; const v=roundTo(x,step); const u=$('#unit').value; return Number.isFinite(v)? v.toFixed(1)+' '+u:'—'; }
+
+    function compute(){
+      const lifted=parseFloat($('#lifted').value); const reps=parseInt($('#reps').value);
+      if(!lifted||!reps) throw new Error('Informe carga e reps.');
+      const oneRM=brzycki1RM(lifted,reps);
+      if(!Number.isFinite(oneRM)) throw new Error('Reps fora de intervalo válido.');
+
+      // alvo (opcional)
+      const pct=parseFloat($('#targetPct').value); const repsT=parseInt($('#targetReps').value);
+      let target=null; if(pct) target=oneRM*(pct/100); else if(repsT) target=oneRM*pctFromReps(repsT);
+
+      // Tabela por zonas de %1RM
+      const tbody=$('#tableZones tbody'); tbody.innerHTML='';
+      const unit=$('#unit').value; const step=parseFloat($('#rounding').value)||1;
+      for(let p=100; p>=50; p-=5){
+        const perc = p/100;
+        let rEst = Math.round(Math.max(1, Math.min(20, repsFromPct(perc))));
+        const w = roundTo(oneRM*perc, step);
+        const tr=document.createElement('tr');
+        tr.innerHTML = `<td>${p}%</td><td>${rEst}</td><td>${w.toFixed(1)} ${unit}</td>`;
+        tbody.appendChild(tr);
+      }
+
+      return {oneRM,target};
+    }
+
+    function render(res){ $('#oneRM').textContent=res?fmtLoad(res.oneRM):'—'; $('#targetLoad').textContent=res&&res.target?fmtLoad(res.target):'—'; }
+    function setMsg(t,o=false){const e=$('#msg');e.textContent=t||'';e.className='tiny '+(o?'ok':'warn');}
+
+    $('#calcBtn').addEventListener('click',()=>{try{const r=compute();render(r);setMsg('Cálculo concluído.',true);}catch(e){render(null);setMsg(e.message,false);}});
+    $('#resetBtn').addEventListener('click',()=>{document.querySelectorAll('input').forEach(i=>i.value='');$('#tableZones tbody').innerHTML='';render(null);setMsg('');});
+    $('#copyBtn').addEventListener('click',()=>{const t=`Brzycki — ${new Date().toLocaleDateString('pt-BR')}\n1RM: ${$('#oneRM').textContent}\nAlvo: ${$('#targetLoad').textContent}`;navigator.clipboard?.writeText(t).then(()=>setMsg('Copiado.',true)).catch(()=>setMsg('Erro ao copiar.'));});
+  </script>
+</body>
+</html>
