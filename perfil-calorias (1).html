@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AKT • Perfil & Calorias</title>
+<style>
+:root{--bg1:#0a0a0a;--bg2:#000;--text:#e5e5e5;--sub:#a1a1aa;--border:#27272a;--panel:rgba(24,24,27,.6);--panel2:rgba(17,17,19,.7);--accent:#f97316;--good:#86efac;--bad:#fca5a5;}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--text);background:linear-gradient(var(--bg1),var(--bg2));font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial}
+.container{max-width:960px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+h1{font-size:22px;margin:0;font-weight:600}
+.section{margin:16px 0}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,.4);padding:16px}
+.card.alt{background:var(--panel2)}
+.card h2{font-size:18px;margin:0 0 10px;font-weight:600}
+label.f{display:grid;gap:4px;margin-bottom:8px}
+label.f span{font-size:12px;color:var(--sub)}
+input.inp,select.inp{width:100%;border:1px solid var(--border);border-radius:12px;background:rgba(39,39,42,.4);color:var(--text);padding:8px 10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.seg button{padding:8px 12px;font-size:13px;background:transparent;border-left:1px solid var(--border);color:var(--text);cursor:pointer}
+.seg button:first-child{border-left:none}
+.seg button.active{background:var(--accent);color:#000}
+.big{font-size:24px;font-weight:700}
+.divider{height:1px;background:var(--border);margin:8px 0 16px}
+.note{margin-top:8px;font-size:12px;color:var(--sub)}
+footer{padding:24px 0;text-align:center;font-size:12px;color:var(--sub)}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>AKT • Perfil & Calorias</h1>
+  </header>
+</div>
+
+<main class="container">
+  <section class="section">
+    <div class="card">
+      <h2>Perfil</h2>
+      <div class="two">
+        <label class="f"><span>Sexo</span>
+          <div class="seg" id="sexSeg">
+            <button type="button" data-sex="male" class="active">Masculino</button>
+            <button type="button" data-sex="female">Feminino</button>
+          </div>
+        </label>
+        <label class="f"><span>Idade (anos)</span><input id="age" class="inp" type="number" min="10" value="28"></label>
+        <label class="f"><span>Altura (cm)</span><input id="height" class="inp" type="number" min="50" step="0.1" value="175"></label>
+        <label class="f"><span>Peso (kg)</span><input id="weight" class="inp" type="number" min="20" step="0.1" value="80"></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="card alt">
+      <h2>Pollock 7 Dobras (mm) • % Gordura (Siri)</h2>
+      <div class="two">
+        <label class="f"><span>Peitoral</span><input id="skChest" class="inp" type="number" min="0" step="1" value="8"></label>
+        <label class="f"><span>Axilar média</span><input id="skAxilla" class="inp" type="number" min="0" step="1" value="10"></label>
+        <label class="f"><span>Tríceps</span><input id="skTriceps" class="inp" type="number" min="0" step="1" value="12"></label>
+        <label class="f"><span>Subescapular</span><input id="skSubscap" class="inp" type="number" min="0" step="1" value="12"></label>
+        <label class="f"><span>Abdominal</span><input id="skAbd" class="inp" type="number" min="0" step="1" value="14"></label>
+        <label class="f"><span>Suprailíaca</span><input id="skSupra" class="inp" type="number" min="0" step="1" value="12"></label>
+        <label class="f"><span>Coxa</span><input id="skThigh" class="inp" type="number" min="0" step="1" value="14"></label>
+      </div>
+      <div class="divider"></div>
+      <div class="two">
+        <label class="f"><span>Soma (mm)</span><div class="big" id="sum7">—</div></label>
+        <label class="f"><span>Densidade corporal</span><div class="big" id="density">—</div></label>
+        <label class="f"><span>% Gordura</span><div class="big" id="bfPct">—</div></label>
+        <label class="f"><span>Massa magra (kg)</span><div class="big" id="leanMass">—</div></label>
+      </div>
+      <p class="note">Medidas em mm com adipômetro; fórmulas específicas por sexo; conversão via Siri.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="card">
+      <h2>Gasto Calórico</h2>
+      <div class="two">
+        <label class="f"><span>Equação</span>
+          <select id="formula" class="inp">
+            <option value="mifflin">Mifflin–St Jeor (padrão)</option>
+            <option value="harris">Harris–Benedict (1984)</option>
+            <option value="cunningham">Cunningham (usa FFM)</option>
+            <option value="tinsley_ffm">Tinsley (FFM)</option>
+            <option value="tinsley_bw">Tinsley (Peso)</option>
+            <option value="mifflin_slow">Mifflin — metabolismo lento/obesos</option>
+          </select>
+        </label>
+        <label class="f"><span>Atividade</span>
+          <select id="activity" class="inp">
+            <option value="sedentary">Sedentário (pouco exercício)</option>
+            <option value="light">Leve (1–3x/sem)</option>
+            <option value="moderate" selected>Moderado (3–5x/sem)</option>
+            <option value="active">Ativo (6–7x/sem)</option>
+            <option value="very_active">Muito ativo/Trabalho físico</option>
+          </select>
+        </label>
+        <label class="f"><span>BMR</span><div class="big" id="bmr">—</div></label>
+        <label class="f"><span>Manutenção (kcal/dia)</span><div class="big" id="tdee">—</div></label>
+      </div>
+      <p class="note" id="formulaNote"></p>
+    </div>
+  </section>
+</main>
+
+<div class="container"><footer>© <span id="year"></span> AKT Labs — (educacional; não substitui avaliação clínica).</footer></div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const $=(s,r=document)=>r.querySelector(s);
+  const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const round=(v,n=1)=>Number.isFinite(v)?Number(v.toFixed(n)):0;
+  const clamp=(v,min,max)=>Math.min(Math.max(v,min),max);
+  const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  const load=(k,d)=>{try{const r=localStorage.getItem(k);return r?JSON.parse(r):d;}catch(e){return d;}}
+  const yearEl=$('#year'); if(yearEl) yearEl.textContent=String(new Date().getFullYear());
+
+  let sex=load('sex','male'), age=load('age',28), height=load('height',175), weight=load('weight',80);
+  let activity=load('activity','moderate'), formula=load('formula','mifflin');
+  const skin={ skChest:load('skChest',8), skAxilla:load('skAxilla',10), skTriceps:load('skTriceps',12), skSubscap:load('skSubscap',12), skAbd:load('skAbd',14), skSupra:load('skSupra',12), skThigh:load('skThigh',14)};
+
+  function bindNum(id,get,set){ const el=$(id); if(!el) return; el.value=String(get()); el.addEventListener('input',()=>{ set(Number(el.value)); recalc();}); }
+  function syncSex(){ $$('#sexSeg button').forEach(b=>b.classList.remove('active')); const act=document.querySelector(`#sexSeg button[data-sex="${sex}"]`); if(act) act.classList.add('active'); }
+  $('#sexSeg').addEventListener('click',e=>{ const t=e.target; if(!(t instanceof HTMLButtonElement)) return; sex=t.getAttribute('data-sex')||'male'; save('sex',sex); syncSex(); recalc(); });
+
+  bindNum('#age',()=>age,v=>{age=v; save('age',v)});
+  bindNum('#height',()=>height,v=>{height=v; save('height',v)});
+  bindNum('#weight',()=>weight,v=>{weight=v; save('weight',v)});
+
+  const actSel=$('#activity'); actSel.value=activity; actSel.addEventListener('change',()=>{activity=actSel.value; save('activity',activity); recalc();});
+  const fSel=$('#formula'); fSel.value=formula; fSel.addEventListener('change',()=>{formula=fSel.value; save('formula',formula); recalc();});
+
+  function densityPollock7(sum,age,sex){ return sex==='male' ? (1.112-0.00043499*sum+0.00000055*sum*sum-0.00028826*age) : (1.097-0.00046971*sum+0.00000056*sum*sum-0.00012828*age); }
+  function percentSiri(d){ if(!d||d<=0) return 0; return 495/d-450; }
+  function bmrMifflin({sex,weightKg,heightCm,age}){ return sex==='male'? (10*weightKg+6.25*heightCm-5*age+5):(10*weightKg+6.25*heightCm-5*age-161); }
+  function bmrHarris({sex,weightKg,heightCm,age}){ return sex==='male'? (88.362+13.397*weightKg+4.799*heightCm-5.677*age):(447.593+9.247*weightKg+3.098*heightCm-4.330*age); }
+  const cunningham=(FFM)=>500+22*FFM;
+  const tinsleyFFM=(FFM)=>25.9*FFM+284;
+  const tinsleyBW=(BW)=>24.8*BW+10;
+  const ACTIVITY={sedentary:1.2,light:1.375,moderate:1.55,active:1.725,very_active:1.9};
+
+  function recalc(){
+    const sum7=skin.skChest+skin.skAxilla+skin.skTriceps+skin.skSubscap+skin.skAbd+skin.skSupra+skin.skThigh;
+    const dens=densityPollock7(sum7,Number(age),sex);
+    const bf=round(Math.min(Math.max(percentSiri(dens),2),70),1);
+    const lean=round(Number(weight)*(1-bf/100),1);
+
+    const sumEl=$('#sum7'), dEl=$('#density'), bfEl=$('#bfPct'), lmEl=$('#leanMass');
+    if(sumEl) sumEl.textContent=String(sum7);
+    if(dEl) dEl.textContent=Number.isFinite(dens)?String(round(dens,4)):'—';
+    if(bfEl) bfEl.textContent=Number.isFinite(bf)?`${bf}%`:'—';
+    if(lmEl) lmEl.textContent=Number.isFinite(lean)?`${lean}`:'—';
+
+    const act=ACTIVITY[activity]||1.55;
+    const w=Number(weight), h=Number(height), a=Number(age);
+    let bmr=NaN, note='';
+    if(formula==='mifflin'){ bmr=bmrMifflin({sex,weightKg:w,heightCm:h,age:a}); note='Mifflin–St Jeor (padrão).'; }
+    else if(formula==='harris'){ bmr=bmrHarris({sex,weightKg:w,heightCm:h,age:a}); note='Harris–Benedict (1984).'; }
+    else if(formula==='cunningham'){ if(Number.isFinite(lean)&&lean>0){ bmr=cunningham(lean); note='Cunningham (usa FFM estimada).'; } else { note='Cunningham requer FFM: preencha as 7 dobras.'; } }
+    else if(formula==='tinsley_ffm'){ if(Number.isFinite(lean)&&lean>0){ bmr=tinsleyFFM(lean); note='Tinsley (FFM).'; } else { note='Tinsley (FFM) requer FFM: preencha as 7 dobras.'; } }
+    else if(formula==='tinsley_bw'){ bmr=tinsleyBW(w); note='Tinsley (peso).'; }
+    else if(formula==='mifflin_slow'){ bmr=bmrMifflin({sex,weightKg:w,heightCm:h,age:a})*0.92; note='Mifflin com ajuste −8% (heurístico).'; }
+
+    const tdee=Math.round(bmr*(act||1)); // manutenção
+    const bEl=$('#bmr'), tEl=$('#tdee'), nEl=$('#formulaNote');
+    if(bEl) bEl.textContent=Number.isFinite(bmr)?`${Math.round(bmr)} kcal/dia`:'—';
+    if(tEl) tEl.textContent=Number.isFinite(tdee)?`${tdee} kcal/dia`:'—';
+    if(nEl) nEl.textContent=note;
+  }
+
+  // init
+  syncSex(); recalc();
+});
+</script>
+</body>
+</html>
