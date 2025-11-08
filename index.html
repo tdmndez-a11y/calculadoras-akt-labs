@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AKT Labs • Índice de Calculadoras</title>
+  <meta name="description" content="Índice elegante para todas as calculadoras e páginas HTML deste repositório." />
+  <link rel="preconnect" href="https://api.github.com" crossorigin>
+  <style>
+    :root{
+      /* Paleta inspirada nas calculadoras AKT */
+      --bg:#07090c;         
+      --panel:#0b1015;      
+      --card:#0e141b;       
+      --card-hi:#111a23;    
+      --ink:#e8eef5;        
+      --muted:#97a5b5;      
+      --brand:#00e0b8;      
+      --accent:#2df0ff;     
+      --stroke:#1c2733;     
+      --glow:0 0 0 1px rgba(0,224,184,.35), 0 10px 30px rgba(0,224,184,.16), inset 0 0 40px rgba(0,224,184,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;color:var(--ink);
+      background:
+        radial-gradient(1000px 500px at 100% -10%, rgba(0,224,184,.10), transparent 60%),
+        radial-gradient(900px 600px at -10% 110%, rgba(45,240,255,.08), transparent 60%),
+        linear-gradient(180deg, #05070a, #0a1016 40%, #080d12);
+      font:16px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      letter-spacing:.2px;
+    }
+    .shell{display:grid;grid-template-columns:260px 1fr;min-height:100dvh}
+    @media (max-width:980px){.shell{grid-template-columns:1fr}}
+
+    /* = Header =========================================================== */
+    header{
+      position:sticky;top:0;z-index:50;background:rgba(7,9,12,.6);
+      backdrop-filter:saturate(120%) blur(10px);
+      border-bottom:1px solid var(--stroke);
+    }
+    .header-inner{max-width:1200px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:14px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:42px;height:42px;border-radius:12px;background:
+      conic-gradient(from 210deg,var(--brand),var(--accent),#9fffd6);
+      box-shadow:var(--glow);
+    }
+    h1{margin:0;font-size:18px;font-weight:800;letter-spacing:.4px}
+    .muted{color:var(--muted)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;border:1px solid var(--stroke);background:var(--panel);text-decoration:none;color:var(--ink);font-size:13px}
+    .btn:hover{box-shadow:var(--glow);border-color:rgba(0,224,184,.45)}
+
+    /* = Sidebar ========================================================= */
+    aside{border-right:1px solid var(--stroke);background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel)}
+    .aside-inner{position:sticky;top:67px;padding:18px;display:flex;flex-direction:column;gap:14px;max-height:calc(100dvh - 67px);overflow:auto}
+    .search{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--stroke);border-radius:12px;padding:10px 12px}
+    .search input{all:unset;flex:1;color:var(--ink)}
+    .kbd{font:600 11px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;padding:4px 6px;border-radius:8px;background:var(--card-hi);border:1px solid var(--stroke);color:var(--muted)}
+
+    .section{border:1px solid var(--stroke);border-radius:14px;background:var(--card)}
+    .section summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:700;display:flex;align-items:center;gap:10px}
+    .section summary::-webkit-details-marker{display:none}
+    .section[open]{box-shadow:var(--glow)}
+    .section .count{margin-left:auto;color:var(--muted);font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--stroke)}
+    .folder-list{display:flex;flex-direction:column}
+    .folder{padding:10px 14px;border-top:1px solid var(--stroke);display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none}
+    .folder:hover{background:var(--card-hi)}
+
+    /* = Main / Cards ===================================================== */
+    main{min-width:0}
+    .wrap{max-width:1200px;margin:0 auto;padding:22px}
+    .stat{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 12px 0}
+    .chip{font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(0,224,184,.10);border:1px solid rgba(0,224,184,.35);color:#b8ffee}
+
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:14px}
+    @media(min-width:680px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:1024px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+    .card{position:relative;overflow:hidden;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 60%), var(--card);border:1px solid var(--stroke)}
+    .card::after{content:"";position:absolute;inset:0;background:radial-gradient(500px 180px at 110% -10%, rgba(0,224,184,.18), transparent 60%);opacity:0;transition:opacity .25s}
+    .card:hover{border-color:rgba(0,224,184,.6);box-shadow:var(--glow)}
+    .card:hover::after{opacity:1}
+    .card a{display:block;color:inherit;text-decoration:none;padding:18px}
+    .path{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .title{margin-top:8px;font-weight:800;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta{margin-top:10px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;background:rgba(0,224,184,.12);color:#9fffd6;border:1px solid rgba(0,224,184,.35)}
+
+    /* = Empty / Error / Skeleton ======================================== */
+    .msg{margin-top:16px;padding:14px;border-radius:12px;border:1px dashed var(--stroke);color:var(--muted);background:linear-gradient(180deg, rgba(255,255,255,.02), transparent)}
+    .error{background:#241317;border:1px solid #6a1a26;color:#ffd5db}
+    .skeleton{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .sk{height:94px;border-radius:16px;background:linear-gradient(90deg, #0f151c, #101921, #0f151c);animation:sh 1.2s infinite ease-in-out;background-size:200%}
+    @keyframes sh{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+
+    footer{max-width:1200px;margin:18px auto 30px;padding:0 22px;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>AKT Labs • Índice de Calculadoras</h1>
+          <div class="muted" id="repoName">tdmndez-a11y/calculadoras-akt-labs</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn" id="openSite" target="_blank" rel="noopener" title="Abrir GitHub Pages">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 3h7v7" stroke="currentColor" stroke-width="1.5"/><path d="M21 3l-8 8" stroke="currentColor" stroke-width="1.5"/><path d="M3 7v13h13" stroke="currentColor" stroke-width="1.5"/></svg>
+          Abrir site
+        </a>
+        <a class="btn" id="openRepo" target="_blank" rel="noopener" title="Abrir repositório no GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 19 2.77 5.07 5.07 0 0 0 18.91.64S17.73.29 15 2.2a13.38 13.38 0 0 0-6 0C6.27.29 5.09.64 5.09.64A5.07 5.07 0 0 0 5 2.77 5.44 5.44 0 0 0 3.5 8.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 21.13V23" stroke="currentColor" stroke-width="1.5"/></svg>
+          Abrir repo
+        </a>
+        <span class="btn" id="count">0 páginas</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside>
+      <div class="aside-inner">
+        <div class="search" title="Pesquisar por nome do arquivo ou pasta">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <input id="q" placeholder="Buscar páginas .html…" autocomplete="off" />
+          <span class="kbd" title="Atalho">/</span>
+        </div>
+
+        <details class="section" open>
+          <summary>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="1.5"/></svg>
+            Pastas
+            <span class="count" id="folderCount">0</span>
+          </summary>
+          <div id="folderList" class="folder-list"></div>
+        </details>
+
+        <details class="section">
+          <summary>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.5"/></svg>
+            Filtros rápidos
+          </summary>
+          <a class="folder" data-filter="root" href="#">Somente raiz</a>
+          <a class="folder" data-filter="sub" href="#">Somente subpastas</a>
+          <a class="folder" data-filter="all" href="#">Todas</a>
+        </details>
+
+      </div>
+    </aside>
+
+    <main>
+      <div class="wrap">
+        <div class="stat">
+          <span class="chip" id="statRoot">0 na raiz</span>
+          <span class="chip" id="statSub">0 em subpastas</span>
+        </div>
+        <div id="skeleton" class="skeleton" aria-hidden="true">
+          <div class="sk"></div><div class="sk"></div><div class="sk"></div>
+          <div class="sk"></div><div class="sk"></div><div class="sk"></div>
+        </div>
+        <div id="results" class="grid" aria-live="polite" hidden></div>
+        <div id="fallback" class="msg" style="display:none"></div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div>
+      Gera automaticamente links para todos os arquivos <code>.html</code> (exceto este <code>index.html</code>). Use <b>/</b> para focar a busca e <b>↑ / ↓</b> + <b>Enter</b> para abrir rápido.
+    </div>
+  </footer>
+
+  <script>
+    // ====== CONFIG ======
+    const OWNER = 'tdmndez-a11y';
+    const REPO  = 'calculadoras-akt-labs';
+    const SITE_ROOT = `https://${OWNER}.github.io/${REPO}/`;
+    const API_ROOT  = `https://api.github.com/repos/${OWNER}/${REPO}/contents`;
+
+    // ====== STATE ======
+    const pages = []; // { path, name, dir }
+    let filterMode = 'all'; // root | sub | all
+
+    // ====== DOM ======
+    const resultsEl = document.getElementById('results');
+    const countEl   = document.getElementById('count');
+    const openSite  = document.getElementById('openSite');
+    const openRepo  = document.getElementById('openRepo');
+    const qEl       = document.getElementById('q');
+    const fallback  = document.getElementById('fallback');
+    const skeleton  = document.getElementById('skeleton');
+    const folderList= document.getElementById('folderList');
+    const folderCount = document.getElementById('folderCount');
+    const statRoot = document.getElementById('statRoot');
+    const statSub  = document.getElementById('statSub');
+
+    openSite.href = SITE_ROOT;
+    openRepo.href = `https://github.com/${OWNER}/${REPO}`;
+
+    // ====== HELPERS ======
+    function isHtml(name){ return name.toLowerCase().endsWith('.html'); }
+    function toTitle(name){
+      return name
+        .replace(/\.html$/i,'')
+        .replace(/[-_]/g,' ')
+        .replace(/\s+/g,' ')
+        .trim()
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function makeCard(item){
+      const url = SITE_ROOT + encodeURI(item.path);
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `
+        <a href="${url}" target="_blank" rel="noopener">
+          <div class="path">/${item.dir || ''}</div>
+          <div class="title">${toTitle(item.name)}</div>
+          <div class="meta">
+            <span class="badge">${item.name}</span>
+            ${item.dir ? `<span>• ${item.dir}</span>` : ''}
+          </div>
+        </a>`;
+      return el;
+    }
+
+    function render(list){
+      resultsEl.innerHTML = '';
+      if(!list.length){
+        resultsEl.hidden = false;
+        const div = document.createElement('div');
+        div.className = 'msg';
+        div.textContent = 'Nenhuma página encontrada para o filtro atual.';
+        resultsEl.appendChild(div);
+      } else {
+        list.forEach(item => resultsEl.appendChild(makeCard(item)));
+      }
+      countEl.textContent = `${list.length} página${list.length===1?'':'s'}`;
+    }
+
+    function filter(term){
+      term = term.trim().toLowerCase();
+      let base = pages;
+      if(filterMode === 'root') base = base.filter(p => !p.dir);
+      if(filterMode === 'sub')  base = base.filter(p => !!p.dir);
+      if(!term) return base;
+      return base.filter(p =>
+        p.name.toLowerCase().includes(term) ||
+        (p.dir && p.dir.toLowerCase().includes(term)) ||
+        p.path.toLowerCase().includes(term)
+      );
+    }
+
+    function updateStats(){
+      const root = pages.filter(p=>!p.dir).length;
+      const sub  = pages.filter(p=>!!p.dir).length;
+      statRoot.textContent = `${root} na raiz`;
+      statSub.textContent  = `${sub} em subpastas`;
+      const folders = [...new Set(pages.map(p=>p.dir).filter(Boolean))].sort();
+      folderCount.textContent = folders.length;
+      folderList.innerHTML = '';
+      folders.forEach(dir=>{
+        const a = document.createElement('a');
+        a.className = 'folder';
+        a.href = '#';
+        a.textContent = dir;
+        a.addEventListener('click', (e)=>{
+          e.preventDefault();
+          qEl.value = dir;
+          render(filter(qEl.value));
+          qEl.focus();
+        });
+        folderList.appendChild(a);
+      });
+    }
+
+    // ====== Events ======
+    qEl.addEventListener('input', () => render(filter(qEl.value)) );
+    document.querySelectorAll('[data-filter]').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        e.preventDefault();
+        filterMode = el.dataset.filter;
+        render(filter(qEl.value));
+      });
+    });
+
+    // Atalhos: / foca busca; setas navegam; Enter abre
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === '/'){
+        e.preventDefault();
+        qEl.focus();
+      }
+      if((e.key === 'ArrowDown' || e.key === 'ArrowUp') && resultsEl){
+        const links = [...resultsEl.querySelectorAll('.card a')];
+        if(!links.length) return;
+        e.preventDefault();
+        let idx = links.findIndex(l=>l === document.activeElement);
+        if(e.key === 'ArrowDown') idx = (idx+1+links.length)%links.length;
+        if(e.key === 'ArrowUp')   idx = (idx-1+links.length)%links.length;
+        links[idx].focus();
+      }
+      if(e.key === 'Enter' && document.activeElement?.closest?.('.card')){
+        document.activeElement.click();
+      }
+    });
+
+    // ====== FETCH (recursive) ======
+    async function crawl(path=''){
+      const url = API_ROOT + (path ? `/${encodeURIComponent(path)}` : '');
+      const res = await fetch(url, { headers: { 'Accept':'application/vnd.github+json' } });
+      if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const items = await res.json();
+      for(const it of items){
+        if(it.type === 'dir'){
+          await crawl(it.path);
+        } else if(it.type === 'file' && isHtml(it.name)){
+          if(it.name.toLowerCase() === 'index.html') continue; // evita se listar
+          const parts = it.path.split('/');
+          const name = parts.pop();
+          const dir  = parts.join('/');
+          pages.push({ path: it.path, name, dir });
+        }
+      }
+    }
+
+    (async function init(){
+      try{
+        await crawl('');
+        // ordena: raiz primeiro, depois por pasta e nome
+        pages.sort((a,b)=>{
+          if((a.dir||'') !== (b.dir||'')) return (a.dir||'').localeCompare(b.dir||'');
+          return a.name.localeCompare(b.name);
+        });
+        updateStats();
+        skeleton.hidden = true;
+        resultsEl.hidden = false;
+        render(pages);
+      } catch(err){
+        console.error(err);
+        fallback.style.display = 'block';
+        fallback.classList.add('error');
+        fallback.innerHTML = `Falha ao listar arquivos via GitHub API.<br>Você ainda pode criar links manualmente aqui se preferir.`;
+        skeleton.hidden = true;
+        resultsEl.hidden = false;
+        render([]);
+      }
+    })();
+  </script>
+</body>
+</html>
