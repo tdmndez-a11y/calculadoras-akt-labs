@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Protocolo Shape Slim – %FCmáx</title>
-
+<title>AKT Labs — FC Mulheres (Mobile)</title>
 <style>
 :root{
   --bg:#050609; --panel:#10131a; --panel2:#0c1016; --ink:#e8edf2; --muted:#8f9bb0;
-  --accent:#f97316; --accent-soft:#fbbf24; --line:#1f2733; --warn:#ef4444;
+  --accent:#f97316; --line:#1f2733; --warn:#ef4444;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -17,19 +16,19 @@ body{
   color:var(--ink);
 }
 .wrapper{
-  max-width:1160px;
+  max-width:420px;
   margin:0 auto;
-  padding:18px 12px 24px;
+  padding:14px 10px 24px;
 }
 header{
   display:flex;
   align-items:center;
-  gap:12px;
-  margin-bottom:14px;
+  gap:10px;
+  margin-bottom:10px;
 }
 .logo{
-  width:40px;height:40px;
-  border-radius:11px;
+  width:36px;height:36px;
+  border-radius:10px;
   overflow:hidden;
   background:#fff;
 }
@@ -37,38 +36,32 @@ header{
   width:100%;height:100%;object-fit:contain;
 }
 h1{
-  font-size:clamp(18px,3vw,24px);
-  line-height:1.3;
+  font-size:17px;
+  line-height:1.25;
 }
 .sub{
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
   margin-top:2px;
 }
-
-/* Cards & layout */
 .card{
   background:linear-gradient(180deg,#111827 0,#020617 100%);
-  border-radius:16px;
+  border-radius:14px;
   border:1px solid #1e293b;
-  padding:14px;
-  box-shadow:0 16px 40px rgba(0,0,0,.45);
+  padding:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);
 }
-.card + .card{
-  margin-top:12px;
-}
+.card + .card{margin-top:10px}
 .card h2{
-  font-size:16px;
+  font-size:15px;
   margin-bottom:8px;
 }
 .row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
 }
-@media (max-width:720px){
-  .row{grid-template-columns:1fr}
-}
+.row > div{flex:1 1 0}
 label{
   display:block;
   font-size:11px;
@@ -77,424 +70,10 @@ label{
 }
 input{
   width:100%;
-  padding:10px 11px;
-  border-radius:11px;
+  padding:9px 10px;
+  border-radius:10px;
   border:1px solid #1f2937;
   background:var(--panel2);
-  color:var(--ink);
-  font-size:13px;
-}
-input[type="range"]{
-  padding:0;
-  -webkit-appearance:none;
-  appearance:none;
-  background:transparent;
-}
-input:focus{
-  outline:none;
-  border-color:var(--accent);
-}
-input[type="range"]::-webkit-slider-runnable-track{
-  height:4px;
-  border-radius:999px;
-  background:#1f2937;
-}
-input[type="range"]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:16px;height:16px;
-  border-radius:50%;
-  margin-top:-6px;
-  background:var(--accent);
-}
-.small{
-  font-size:11px;
-  color:var(--muted);
-}
-
-/* KPIs */
-.kpis{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-top:4px;
-}
-.kpi{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:9px 10px;
-  border-radius:12px;
-  background:#020617;
-  border:1px solid #1f2937;
-  font-size:12px;
-}
-.kpi span.v{
-  font-weight:700;
-  font-size:13px;
-}
-
-/* Tables */
-.tbl{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:8px;
-  font-size:12px;
-}
-.tbl th,.tbl td{
-  padding:7px 6px;
-  border-bottom:1px solid #111827;
-}
-.tbl th{
-  text-align:left;
-  color:#e5e7eb;
-  background:#020617;
-}
-.tbl tr:nth-child(even){
-  background:#030712;
-}
-
-/* Alerts */
-.warn{
-  margin-top:8px;
-  padding:8px 10px;
-  border-radius:11px;
-  border:1px solid #7f1d1d;
-  background:#450a0a;
-  color:#fecaca;
-  font-size:11px;
-}
-
-/* View switch */
-.view-toggle{
-  display:inline-flex;
-  padding:3px;
-  border-radius:999px;
-  background:#020617;
-  border:1px solid #1f2937;
-  margin-bottom:8px;
-}
-.view-toggle button{
-  border:none;
-  background:transparent;
-  color:var(--muted);
-  font-size:11px;
-  padding:6px 10px;
-  border-radius:999px;
-  cursor:pointer;
-}
-.view-toggle button.active{
-  background:linear-gradient(90deg,#f97316,#fbbf24);
-  color:#111827;
-  font-weight:600;
-}
-
-/* Containers of views */
-.view{
-  margin-top:4px;
-}
-.hidden{
-  display:none !important;
-}
-
-footer{
-  margin-top:12px;
-  text-align:center;
-  font-size:10px;
-  color:#6b7280;
-}
-
-hr{
-  border:none;
-  border-top:1px solid #1f2937;
-  margin:8px 0;
-}
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <header>
-    <div class="logo">
-      <img src="logo.png" alt="AKT" onerror="this.parentElement.style.display='none'">
-    </div>
-    <div>
-      <h1>Frequência Cardíaca de Treino — Mulheres</h1>
-      <div class="sub">Fórmula de Gulati (206 − 0,88×idade) · Zonas de treino por % da FCmáx</div>
-    </div>
-  </header>
-
-  <!-- ENTRADAS ÚNICAS (compartilhadas entre as duas visões) -->
-  <section class="card" id="formRoot">
-    <h2>Entradas</h2>
-
-    <div class="row">
-      <div>
-        <label>Idade (anos)</label>
-        <input id="age" type="number" min="10" max="90" value="28">
-      </div>
-      <div>
-        <label>Intensidade alvo (%)</label>
-        <input id="intensity" type="range" min="40" max="95" step="1" value="70"
-               oninput="document.getElementById('intenVal').textContent=this.value+'%'">
-        <div class="small">Atual: <span id="intenVal">70%</span></div>
-      </div>
-    </div>
-
-    <hr>
-
-    <div class="small">
-      • Ferramenta pensada para mulheres saudáveis, sem diagnóstico cardiológico.<br>
-      • Use as zonas como referência e ajuste pela percepção de esforço (RPE).
-    </div>
-
-    <div id="alerts"></div>
-  </section>
-
-  <!-- SWITCH ENTRE DESKTOP E MOBILE -->
-  <section class="card">
-    <div class="view-toggle">
-      <button type="button" id="btnDesktop" class="active" data-view="desktop">Visual completo (desktop)</button>
-      <button type="button" id="btnMobile" data-view="mobile">Visual compacto (mobile)</button>
-    </div>
-
-    <!-- VIEW DESKTOP -->
-    <div id="viewDesktop" class="view">
-      <h2>Resultados — Visual Desktop</h2>
-
-      <div class="kpis">
-        <div class="kpi">
-          <span>FCmáx estimada (Gulati)</span>
-          <span class="v"><span id="hrmaxOut_full">—</span> bpm</span>
-        </div>
-        <div class="kpi">
-          <span>Alvo na intensidade atual</span>
-          <span class="v"><span id="targetOut_full">—</span> bpm</span>
-        </div>
-      </div>
-
-      <h3 style="margin:10px 0 4px;font-size:13px;">Zonas de treino (Z1–Z5)</h3>
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>Zona</th>
-            <th>% FCmáx</th>
-            <th>Descrição</th>
-            <th>FC (bpm)</th>
-          </tr>
-        </thead>
-        <tbody id="zoneRows_full">
-          <tr><td>Z1</td><td>50–60%</td><td>Recuperação</td><td>—</td></tr>
-          <tr><td>Z2</td><td>60–70%</td><td>Base / Endurance</td><td>—</td></tr>
-          <tr><td>Z3</td><td>70–80%</td><td>Tempo</td><td>—</td></tr>
-          <tr><td>Z4</td><td>80–90%</td><td>Limite / VO₂</td><td>—</td></tr>
-          <tr><td>Z5</td><td>90–100%</td><td>Anaeróbio</td><td>—</td></tr>
-        </tbody>
-      </table>
-
-      <h3 style="margin:12px 0 4px;font-size:13px;">Comparação de fórmulas de FCmáx</h3>
-      <table class="tbl">
-        <thead><tr><th>Fórmula</th><th>Equação</th><th>FCmáx (bpm)</th></tr></thead>
-        <tbody id="cmpRows_full"></tbody>
-      </table>
-    </div>
-
-    <!-- VIEW MOBILE -->
-    <div id="viewMobile" class="view hidden">
-      <h2>Resultados — Visual Mobile</h2>
-
-      <div class="kpis">
-        <div class="kpi">
-          <span>FCmáx (Gulati)</span>
-          <span class="v"><span id="hrmaxOut_mob">—</span> bpm</span>
-        </div>
-        <div class="kpi">
-          <span>Alvo atual</span>
-          <span class="v"><span id="targetOut_mob">—</span> bpm</span>
-        </div>
-      </div>
-
-      <h3 style="margin:10px 0 4px;font-size:13px;">Zonas</h3>
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>Zona</th>
-            <th>%</th>
-            <th>Descrição</th>
-            <th>FC (bpm)</th>
-          </tr>
-        </thead>
-        <tbody id="zoneRows_mob">
-          <tr><td>Z1</td><td>50–60%</td><td>Recuperação</td><td>—</td></tr>
-          <tr><td>Z2</td><td>60–70%</td><td>Base</td><td>—</td></tr>
-          <tr><td>Z3</td><td>70–80%</td><td>Tempo</td><td>—</td></tr>
-          <tr><td>Z4</td><td>80–90%</td><td>Limite</td><td>—</td></tr>
-          <tr><td>Z5</td><td>90–100%</td><td>Anaeróbio</td><td>—</td></tr>
-        </tbody>
-      </table>
-
-      <div class="small" style="margin-top:6px;">
-        Regra da conversa: Z1 conversa fácil · Z2 frases curtas · Z3 frases cortadas · Z4 palavras soltas · Z5 quase sem falar.
-      </div>
-    </div>
-  </section>
-
-  <footer>© AKT Labs — uso educativo, não substitui avaliação médica ou teste cardiológico formal.</footer>
-</div>
-
-<script>
-const $ = (q)=>document.querySelector(q);
-const round = (v)=>Math.round(v);
-
-// Fórmulas de FCmáx
-const gulati = age => 206 - 0.88 * age; // validada em mulheres
-const tanaka = age => 208 - 0.7 * age;
-const fox    = age => 220 - age;
-
-function targetByPct(hrmax, pct){
-  return hrmax * (pct/100);
-}
-
-function computeZones(hrmax){
-  const bands = [
-    {z:'Z1', lo:50, hi:60, desc:'Recuperação'},
-    {z:'Z2', lo:60, hi:70, desc:'Base / Endurance'},
-    {z:'Z3', lo:70, hi:80, desc:'Tempo'},
-    {z:'Z4', lo:80, hi:90, desc:'Limite / VO₂'},
-    {z:'Z5', lo:90, hi:100, desc:'Anaeróbio'},
-  ];
-  return bands.map(b=>{
-    const lo = targetByPct(hrmax, b.lo);
-    const hi = targetByPct(hrmax, b.hi);
-    return { ...b, bpm:`${round(lo)}–${round(hi)}` };
-  });
-}
-
-function render(){
-  const age = parseInt($('#age').value || 0);
-  const pct = parseInt($('#intensity').value || 70);
-
-  const hrmax = gulati(age);
-  const valid = Number.isFinite(hrmax) && hrmax > 0;
-
-  // KPIs desktop
-  const hrFull = $('#hrmaxOut_full');
-  const tgFull = $('#targetOut_full');
-  const hrMob  = $('#hrmaxOut_mob');
-  const tgMob  = $('#targetOut_mob');
-
-  if(valid){
-    const target = targetByPct(hrmax, pct);
-
-    if(hrFull) hrFull.textContent = round(hrmax);
-    if(tgFull) tgFull.textContent = round(target);
-    if(hrMob)  hrMob.textContent  = round(hrmax);
-    if(tgMob)  tgMob.textContent  = round(target);
-
-    // Zonas
-    const zones = computeZones(hrmax);
-
-    const tbFull = $('#zoneRows_full');
-    if(tbFull){
-      tbFull.innerHTML = '';
-      zones.forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.z}</td>
-          <td>${r.lo}–${r.hi}%</td>
-          <td>${r.desc}</td>
-          <td>${r.bpm}</td>
-        `;
-        tbFull.appendChild(tr);
-      });
-    }
-
-    const tbMob = $('#zoneRows_mob');
-    if(tbMob){
-      tbMob.innerHTML = '';
-      zones.forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.z}</td>
-          <td>${r.lo}–${r.hi}%</td>
-          <td>${r.desc}</td>
-          <td>${r.bpm}</td>
-        `;
-        tbMob.appendChild(tr);
-      });
-    }
-
-    // Comparação de fórmulas (apenas desktop)
-    const cmpBody = $('#cmpRows_full');
-    if(cmpBody){
-      const c1 = gulati(age);
-      const c2 = tanaka(age);
-      const c3 = fox(age);
-      const rows = [
-        {name:'Gulati (mulheres)', eq:'206 − 0,88×idade', val:c1},
-        {name:'Tanaka (geral)',    eq:'208 − 0,7×idade',  val:c2},
-        {name:'Fox (geral)',       eq:'220 − idade',      val:c3},
-      ];
-      cmpBody.innerHTML = '';
-      rows.forEach(c=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${c.name}</td><td>${c.eq}</td><td>${round(c.val)}</td>`;
-        cmpBody.appendChild(tr);
-      });
-    }
-  }else{
-    if(hrFull) hrFull.textContent = '—';
-    if(tgFull) tgFull.textContent = '—';
-    if(hrMob)  hrMob.textContent  = '—';
-    if(tgMob)  tgMob.textContent  = '—';
-  }
-
-  // Alertas
-  const alerts = [];
-  if(age < 16 || age > 75){
-    alerts.push('Idades muito baixas ou muito altas tornam a estimativa menos precisa. Use como referência, não como laudo.');
-  }
-  alerts.push('Ajuste sempre pelas sensações reais de esforço (RPE). Se você tem histórico cardíaco ou usa medicação, consulte um médico.');
-
-  $('#alerts').innerHTML = `<div class="warn">${alerts.map(a=>'• '+a).join('<br>')}</div>`;
-}
-
-function debounce(fn, ms){
-  let t;
-  return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); };
-}
-const debounced = debounce(render, 120);
-
-function attach(){
-  const root = document.getElementById('formRoot');
-  root.addEventListener('input', debounced);
-  root.addEventListener('change', debounced);
-
-  // Switch de visual
-  const btnDesk = document.getElementById('btnDesktop');
-  const btnMob  = document.getElementById('btnMobile');
-  const vDesk   = document.getElementById('viewDesktop');
-  const vMob    = document.getElementById('viewMobile');
-
-  function setView(mode){
-    const desktop = mode === 'desktop';
-    vDesk.classList.toggle('hidden', !desktop);
-    vMob.classList.toggle('hidden', desktop);
-    btnDesk.classList.toggle('active', desktop);
-    btnMob.classList.toggle('active', !desktop);
-  }
-
-  btnDesk.addEventListener('click', ()=>setView('desktop'));
-  btnMob.addEventListener('click',  ()=>setView('mobile'));
-}
-
-window.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('intenVal').textContent =
-    (document.getElementById('intensity').value || '70') + '%';
-  attach();
-  render();
-});
-</script>
-</body>
-</html>
   color:var(--ink);
   font-size:13px;
 }
