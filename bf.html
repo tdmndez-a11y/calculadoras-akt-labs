@@ -1,77 +1,307 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora de BF — AKT Labs</title>
-  <style>
-    :root{
-      --bg:#0b0c10; --card:#13151a; --ink:#e8edf2; --muted:#a7b0bd; --accent:#f97316; --accent-2:#fb923c; --danger:#ef4444; --ok:#34d399; --line:#1f2733;
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%);
-      color:var(--ink)
-    }
-    .wrap{
-      max-width:1000px;
-      margin:40px auto;
-      padding:0 16px
-    }
-    header{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-bottom:16px;
-      flex-wrap:wrap;
-    }
-    .logo{
-      width:42px;
-      height:42px;
-      border-radius:12px;
-      overflow:hidden;
-      flex-shrink:0;
-    }
-    .logo img{
-      width:42px;
-      height:42px;
-      object-fit:contain
-    }
-    h1{
-      margin:0;
-      font-size: clamp(20px,2.4vw,32px)
-    }
-    .sub{
-      color:var(--muted);
-      font-size:13px
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de % de Gordura — AKT Labs</title>
 
-    .grid{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:18px
-    }
-    @media (max-width:900px){
-      .grid{grid-template-columns:1fr}
-    }
+<style>
+  :root{
+    --bg:#0b0c10; --card:#13151a; --ink:#e8edf2; --muted:#a7b0bd; --accent:#f97316; --accent2:#fb923c;
+    --danger:#ef4444; --ok:#34d399; --line:#1f2733; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+  }
+  .wrap{max-width:1000px;margin:40px auto;padding:0 16px}
 
-    .card{
-      background:linear-gradient(180deg,#151922 0%, #10141c 100%);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,.25)
-    }
-    .card h2{
-      margin:0 0 12px;
-      font-size:18px
-    }
-    .sep{
-      height:1px;
-      background:#1b2331;
+  header{display:flex;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+  .logo{width:42px;height:42px;border-radius:12px;overflow:hidden}
+  .logo img{width:100%;height:100%;object-fit:contain}
+
+  h1{margin:0;font-size:clamp(22px,4vw,32px)}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+
+  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:linear-gradient(180deg,#161a23 0%,#11161d 100%);
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:0 8px 20px rgba(0,0,0,.35);
+  }
+  .card h2{margin:0 0 12px;font-size:18px}
+
+  .sep{height:1px;background:#1c2534;margin:10px 0}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .tab{
+    padding:8px 12px;border-radius:999px;font-size:13px;cursor:pointer;
+    background:#0f141c;border:1px solid #273040;
+  }
+  .tab.active{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#0f0e0c;border-color:transparent;font-weight:700;
+  }
+
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:760px){.row,.row3{grid-template-columns:1fr}}
+
+  label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+  input,select{
+    width:100%;padding:12px;border-radius:12px;font-size:14px;
+    border:1px solid #273040;background:#0f141c;color:var(--ink);
+  }
+  input:focus,select:focus{border-color:var(--accent)}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{
+    padding:10px 14px;border-radius:12px;font-size:14px;cursor:pointer;
+    border:1px solid #273040;background:#0f141c;color:var(--ink);
+  }
+  button.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#0a0a0a;border-color:transparent;font-weight:800;
+  }
+
+  .kpi{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px;border-radius:14px;background:#0e1522;border:1px solid #1f2a3c;margin-bottom:12px;
+  }
+  .kpi .v{font-size:22px;font-weight:800}
+
+  .tiny{font-size:11px;color:var(--muted)}
+  .ok{color:var(--ok)}
+  .warn{color:var(--danger)}
+
+  ul{margin:6px 0 0 14px;padding:0;font-size:11px;color:var(--muted)}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<header>
+  <div class="logo"><img src="Logo fundo branco 01 (1) (1).png" alt=""></div>
+  <div>
+    <h1>Calculadora de % de Gordura</h1>
+    <div class="sub">Pollock 7 • Parrillo 9 • Massa magra • Massa gorda</div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- ENTRADAS -->
+  <section class="card">
+    <h2>Dados</h2>
+
+    <div class="tabs" id="methodTabs">
+      <div class="tab active" data-method="jp7">Pollock 7 dobras</div>
+      <div class="tab" data-method="p9">9 dobras (Parrillo)</div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Sexo</label>
+        <select id="sex">
+          <option value="male">Masculino</option>
+          <option value="female">Feminino</option>
+        </select>
+      </div>
+      <div>
+        <label>Idade (anos)</label>
+        <input id="age" type="number" min="10" max="100" placeholder="28">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Peso (kg)</label>
+        <input id="weight" type="number" min="30" max="300" step="0.1">
+      </div>
+      <div>
+        <label>Unidade das dobras</label>
+        <select id="unit"><option value="mm" selected>mm (adipômetro)</option></select>
+      </div>
+    </div>
+
+    <!-- POLLOCK 7 -->
+    <div id="jp7-sites">
+      <div class="sep"></div>
+      <div class="row3">
+        <div><label>Peitoral</label><input id="jp7_chest" type="number" min="1" step="0.1"></div>
+        <div><label>Axilar média</label><input id="jp7_axilla" type="number" min="1" step="0.1"></div>
+        <div><label>Tríceps</label><input id="jp7_triceps" type="number" min="1" step="0.1"></div>
+        <div><label>Subescapular</label><input id="jp7_subscap" type="number" min="1" step="0.1"></div>
+        <div><label>Abdômen</label><input id="jp7_abd" type="number" min="1" step="0.1"></div>
+        <div><label>Supra-ilíaca</label><input id="jp7_supra" type="number" min="1" step="0.1"></div>
+        <div><label>Coxa</label><input id="jp7_thigh" type="number" min="1" step="0.1"></div>
+      </div>
+    </div>
+
+    <!-- 9 DOBRAS -->
+    <div id="p9-sites" style="display:none">
+      <div class="sep"></div>
+      <div class="row3">
+        <div><label>Peitoral</label><input id="p9_chest" type="number"></div>
+        <div><label>Abdômen</label><input id="p9_abd" type="number"></div>
+        <div><label>Coxa</label><input id="p9_thigh" type="number"></div>
+        <div><label>Bíceps</label><input id="p9_biceps" type="number"></div>
+        <div><label>Tríceps</label><input id="p9_triceps" type="number"></div>
+        <div><label>Subescapular</label><input id="p9_subscap" type="number"></div>
+        <div><label>Supra-ilíaca</label><input id="p9_supra" type="number"></div>
+        <div><label>Lombar</label><input id="p9_lowback" type="number"></div>
+        <div><label>Panturrilha</label><input id="p9_calf" type="number"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="calcBtn">Calcular</button>
+      <button id="resetBtn">Limpar</button>
+      <button id="copyBtn">Copiar resultado</button>
+    </div>
+    <div id="msg" class="tiny"></div>
+  </section>
+
+  <!-- RESULTADOS -->
+  <aside class="card">
+    <h2>Resultados</h2>
+
+    <div class="kpi"><div>% Gordura</div><div class="v" id="bf">—</div></div>
+    <div class="kpi"><div>Massa gorda</div><div class="v" id="fm">—</div></div>
+    <div class="kpi"><div>Massa magra</div><div class="v" id="lbm">—</div></div>
+    <div class="kpi"><div>Classificação</div><div class="v" id="classif">—</div></div>
+    <div class="sep"></div>
+
+    <div class="tiny">
+      <ul>
+        <li>Pollock 7 → %BF = 495/BD − 450 (Siri)</li>
+        <li>Parrillo → %BF = (27 × soma das dobras) ÷ peso (lb)</li>
+      </ul>
+    </div>
+  </aside>
+
+</div>
+</div>
+
+<script>
+const $=(q)=>document.querySelector(q);
+const $$=(q)=>document.querySelectorAll(q);
+
+// Tabs
+let method="jp7";
+$$('#methodTabs .tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    $$('#methodTabs .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    method=tab.dataset.method;
+    $('#jp7-sites').style.display = method==="jp7" ? "" : "none";
+    $('#p9-sites').style.display  = method==="p9"  ? "" : "none";
+    setMsg("");
+  });
+});
+
+function parse(v){ const n=parseFloat(v);return Number.isFinite(n)?n:null;}
+const kg2lb=kg=>kg*2.20462262185;
+const round1=x=>Math.round(x*10)/10;
+
+function siri(d){return(495/d)-450;}
+
+function classify(sex,bf){
+  if(sex==="male"){
+    if(bf<6) return"Essencial";
+    if(bf<14)return"Atleta";
+    if(bf<18)return"Fitness";
+    if(bf<25)return"Médio";
+    return"Alto";
+  } else {
+    if(bf<14)return"Essencial";
+    if(bf<21)return"Atleta";
+    if(bf<25)return"Fitness";
+    if(bf<32)return"Médio";
+    return"Alto";
+  }
+}
+
+// POLLOCK 7
+function calcJP7(sex,age){
+  const s=["chest","axilla","triceps","subscap","abd","supra","thigh"]
+    .map(k=>parse($('#jp7_'+k).value)||0)
+    .reduce((a,b)=>a+b,0);
+  if(s<=0) throw"Informe as 7 dobras.";
+
+  let bd;
+  if(sex==="male"){
+    bd=1.112-0.00043499*s+0.00000055*s*s-0.00028826*age;
+  }else{
+    bd=1.097-0.00046971*s+0.00000056*s*s-0.00012828*age;
+  }
+  return siri(bd);
+}
+
+// PARRILLO 9
+function calcP9(weight){
+  const s=["chest","abd","thigh","biceps","triceps","subscap","supra","lowback","calf"]
+    .map(k=>parse($('#p9_'+k).value)||0)
+    .reduce((a,b)=>a+b,0);
+  if(s<=0) throw"Informe as 9 dobras.";
+  return (27*s)/kg2lb(weight);
+}
+
+function compute(){
+  const sex=$('#sex').value;
+  const age=parse($('#age').value);
+  const weight=parse($('#weight').value);
+
+  if(!weight) throw"Digite o peso.";
+  if(method==="jp7"&&!age) throw"Pollock 7 requer idade.";
+
+  const bf = method==="jp7" ? calcJP7(sex,age) : calcP9(weight);
+  const fm = weight*(bf/100);
+  const lbm= weight-fm;
+  return {bf,fm,lbm,cls:classify(sex,bf)};
+}
+
+function render(r){
+  $('#bf').textContent   = Number.isFinite(r?.bf)?round1(r.bf)+" %":"—";
+  $('#fm').textContent   = Number.isFinite(r?.fm)?round1(r.fm)+" kg":"—";
+  $('#lbm').textContent  = Number.isFinite(r?.lbm)?round1(r.lbm)+" kg":"—";
+  $('#classif').textContent = r?.cls||"—";
+}
+
+function setMsg(t,ok=false){
+  const el=$('#msg');
+  el.textContent=t;
+  el.className="tiny "+(ok?"ok":"warn");
+}
+
+// Botões
+$('#calcBtn').addEventListener('click',()=>{
+  try{const r=compute();render(r);setMsg("Cálculo concluído.",true);}
+  catch(e){render(null);setMsg(e,false);}
+});
+
+$('#resetBtn').addEventListener('click',()=>{
+  document.querySelectorAll("input").forEach(i=>i.value="");
+  render(null);setMsg("");
+});
+
+$('#copyBtn').addEventListener('click',()=>{
+  const txt=`Resultado — ${new Date().toLocaleDateString("pt-BR")}
+Método: ${method==="jp7"?"Pollock 7":"Parrillo 9"}
+%BF: ${$('#bf').textContent}
+Massa gorda: ${$('#fm').textContent}
+Massa magra: ${$('#lbm').textContent}
+Classificação: ${$('#classif').textContent}`;
+  navigator.clipboard.writeText(txt)
+    .then(()=>setMsg("Copiado.",true))
+    .catch(()=>setMsg("Falha ao copiar."));
+});
+</script>
+</body>
+</html>
       margin:10px 0
     }
 
