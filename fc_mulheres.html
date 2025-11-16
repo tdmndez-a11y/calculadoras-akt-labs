@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AKT Labs — Frequência Cardíaca (Mulheres)</title>
+
+<style>
+:root{
+  --bg:#0b0c10; --panel:#12151b; --panel2:#0f131a; --ink:#e8edf2; --muted:#a7b0bd;
+  --accent:#f97316; --accent2:#fb923c; --line:#1f2733; --warn:#ef4444;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%);
+  color:var(--ink);
+}
+.wrapper{max-width:1160px;margin:28px auto;padding:0 16px}
+
+header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.logo{width:44px;height:44px;border-radius:12px;overflow:hidden;background:#fff}
+.logo img{width:100%;height:100%;object-fit:contain}
+
+h1{margin:0;font-size:clamp(18px,3vw,28px)}
+.sub{color:var(--muted);font-size:13px;margin-top:2px}
+
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+.card{
+  background:linear-gradient(180deg,#151922 0%, #0f141c 100%);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+}
+.card h2{margin:0 0 10px;font-size:18px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:860px){.row{grid-template-columns:1fr}}
+
+label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+
+input{
+  width:100%;padding:12px;border-radius:12px;border:1px solid #273040;
+  background:var(--panel2);color:var(--ink);outline:none;
+}
+input:focus{border-color:var(--accent)}
+
+.small{font-size:12px;color:var(--muted)}
+
+.kpi{
+  background:#0e1522;border:1px solid #1f2a3c;
+  border-radius:12px;padding:12px;margin:8px 0;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.kpi .v{font-weight:800}
+
+.tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{
+  padding:10px;border-bottom:1px solid var(--line);text-align:left
+}
+.tbl th{background:#0f1524}
+.tbl tr:nth-child(even){background:#0e1320}
+
+.warn{
+  background:#2b0f13;border:1px solid #5c1b23;color:#fff;
+  padding:10px;border-radius:12px;
+}
+
+footer{text-align:center;margin-top:20px;color:#738199;font-size:12px}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+<header>
+  <div class="logo"><img src="logo.png" alt="AKT"></div>
+  <div>
+    <h1>Calculadora de Frequência Cardíaca — Mulheres</h1>
+    <div class="sub">Baseada na fórmula validada de Gulati (206 − 0,88×idade)</div>
+  </div>
+</header>
+
+<div class="grid">
+
+<!-- ENTRADAS -->
+<section class="card" id="formRoot">
+  <h2>Entradas</h2>
+
+  <div class="row">
+    <div>
+      <label>Idade (anos)</label>
+      <input id="age" type="number" min="10" max="90" value="28"/>
+    </div>
+
+    <div>
+      <label>Intensidade alvo (%)</label>
+      <input id="intensity" type="range" min="40" max="95" step="1" value="70"
+             oninput="document.getElementById('intenVal').textContent=this.value+'%'"/>
+      <div class="small">Atual: <span id="intenVal">70%</span></div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="small">
+    • FCmáx calculada pela fórmula <b>Gulati</b>, validada exclusivamente em mulheres.<br>
+    • Use as zonas como referência e ajuste pela percepção de esforço (RPE).
+  </div>
+
+  <div id="alerts" style="margin-top:10px"></div>
+</section>
+
+<!-- RESULTADOS -->
+<aside class="card">
+  <h2>Resultados</h2>
+
+  <div class="kpi">
+    <div>FCmáx estimada (Gulati)</div>
+    <div class="v"><span id="hrmaxOut">—</span> bpm</div>
+  </div>
+
+  <div class="kpi">
+    <div>Alvo na intensidade atual</div>
+    <div class="v"><span id="targetOut">—</span> bpm</div>
+  </div>
+
+  <h3 style="margin:12px 0 8px;font-size:16px">Zonas de treino</h3>
+  <table class="tbl">
+    <thead>
+      <tr><th>Zona</th><th>Descrição</th><th>%</th><th>FC (bpm)</th></tr>
+    </thead>
+    <tbody id="zoneRows">
+      <tr><td>Z1</td><td>Recuperação</td><td>50–60%</td><td>—</td></tr>
+      <tr><td>Z2</td><td>Base / Endurance</td><td>60–70%</td><td>—</td></tr>
+      <tr><td>Z3</td><td>Tempo</td><td>70–80%</td><td>—</td></tr>
+      <tr><td>Z4</td><td>Limite</td><td>80–90%</td><td>—</td></tr>
+      <tr><td>Z5</td><td>Anaeróbio</td><td>90–100%</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin:12px 0 8px;font-size:16px">Comparação de fórmulas</h3>
+  <table class="tbl">
+    <thead><tr><th>Fórmula</th><th>Equação</th><th>FCmáx</th></tr></thead>
+    <tbody id="cmpRows"></tbody>
+  </table>
+
+  <div class="small" style="margin-top:8px">
+    <b>Regra da conversa:</b>  
+    Z1 conversa fácil · Z2 frases curtas · Z3 frases entrecortadas · Z4 palavras soltas · Z5 quase sem falar
+  </div>
+</aside>
+
+</div>
+
+<footer>© AKT Labs — ferramenta educativa</footer>
+</div>
+
+<script>
+const $ = (q)=>document.querySelector(q);
+const round = v=>Math.round(v);
+
+// Fórmulas
+const gulati = age => 206 - 0.88 * age;
+const tanaka = age => 208 - 0.7 * age;
+const fox    = age => 220 - age;
+
+function targetByPct(hrmax, pct){
+  return hrmax * (pct/100);
+}
+
+function computeZones(hrmax){
+  const bands = [
+    {z:'Z1', desc:'Recuperação', lo:50, hi:60},
+    {z:'Z2', desc:'Base / Endurance', lo:60, hi:70},
+    {z:'Z3', desc:'Tempo', lo:70, hi:80},
+    {z:'Z4', desc:'Limite', lo:80, hi:90},
+    {z:'Z5', desc:'Anaeróbio', lo:90, hi:100},
+  ];
+  return bands.map(b=>{
+    const lo = targetByPct(hrmax, b.lo);
+    const hi = targetByPct(hrmax, b.hi);
+    return { ...b, bpm:`${round(lo)}–${round(hi)}` };
+  });
+}
+
+function render(){
+  const age = parseInt($('#age').value || 0);
+  const pct = parseInt($('#intensity').value || 70);
+
+  const hrmax = gulati(age);
+  $('#hrmaxOut').textContent = round(hrmax);
+
+  const target = targetByPct(hrmax, pct);
+  $('#targetOut').textContent = round(target);
+
+  // Zonas
+  const zones = computeZones(hrmax);
+  const tb = $('#zoneRows'); tb.innerHTML = '';
+  zones.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.z}</td>
+      <td>${r.desc}</td>
+      <td>${r.lo}–${r.hi}%</td>
+      <td>${r.bpm}</td>
+    `;
+    tb.appendChild(tr);
+  });
+
+  // Comparação
+  const cmp = [
+    {name:'Gulati (mulheres)', eq:'206 − 0,88×idade', val:hrmax},
+    {name:'Tanaka (geral)',    eq:'208 − 0,7×idade',  val:tanaka(age)},
+    {name:'Fox (geral)',       eq:'220 − idade',      val:fox(age)},
+  ];
+  const cb = $('#cmpRows'); cb.innerHTML = '';
+  cmp.forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.name}</td><td>${c.eq}</td><td>${round(c.val)}</td>`;
+    cb.appendChild(tr);
+  });
+
+  // Alertas
+  const alerts = [];
+  if(age < 16 || age > 75){
+    alerts.push('Idades extremas podem tornar a estimativa menos precisa.');
+  }
+  alerts.push('Ajuste sempre pela sensação real durante o treino (RPE).');
+
+  $('#alerts').innerHTML = `<div class="warn">${alerts.map(a=>'• '+a).join('<br>')}</div>`;
+}
+
+function debounce(fn, ms){
+  let t; 
+  return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); };
+}
+const debounced = debounce(render, 120);
+
+function attach(){
+  const root = document.getElementById('formRoot');
+  root.addEventListener('input', debounced);
+  root.addEventListener('change', debounced);
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  $('#intenVal').textContent = $('#intensity').value + '%';
+  attach();
+  render();
+});
+</script>
+
+</body>
+</html>
