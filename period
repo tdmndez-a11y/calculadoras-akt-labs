@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>AKT Labs • Calculadora de Periodização</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Calculadora de periodização RAW, GRIND, SLAUGHTER e ASHES baseada em volume semanal por grupo muscular." />
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #050608;
+      color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #111217;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+      border: 1px solid #252737;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin: 0 0 4px;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 4px 0 10px;
+      font-size: 0.9rem;
+      color: #ccccd6;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #303247;
+      background: radial-gradient(circle at top left, #ff6a00 0, transparent 55%), #141623;
+      margin-bottom: 10px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #ffb347;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+    }
+
+    label {
+      font-weight: 500;
+      color: #e1e1f0;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #8f90a8;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      background: #151724;
+      border: 1px solid #2b2d3f;
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: #f5f5ff;
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      border-color: #ff8c42;
+      box-shadow: 0 0 0 1px rgba(255, 140, 66, 0.28);
+    }
+
+    .phases {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .phases {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .phase-card {
+      background: #151724;
+      border-radius: 12px;
+      padding: 10px;
+      border: 1px solid #26283a;
+      font-size: 0.8rem;
+    }
+
+    .phase-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    .phase-raw { color: #9cd3ff; }
+    .phase-grind { color: #ffb347; }
+    .phase-slaughter { color: #ff6a6a; }
+    .phase-ashes { color: #9f9fb5; }
+
+    .phase-tag {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #34364b;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a8a9c2;
+    }
+
+    .btn-row {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #ff8c42, #ff4b1f);
+      color: #050608;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #c5c6e2;
+      border: 1px solid #33354a;
+      box-shadow: none;
+    }
+
+    .results {
+      margin-top: 24px;
+      border-radius: 14px;
+      padding: 14px;
+      background: #141621;
+      border: 1px solid #26283a;
+    }
+
+    .results h2 {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #26283a;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9f9fb5;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .tag-small {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #34364b;
+      display: inline-block;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: #8f90a8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      AKT Labs • Periodização RAW / GRIND / SLAUGHTER / ASHES
+    </div>
+
+    <h1>Calculadora de Periodização</h1>
+    <p>
+      Defina o <strong>volume-base em séries efetivas/semana</strong> para cada tipo de grupo muscular
+      e veja como ele se distribui entre as fases RAW, GRIND, SLAUGHTER e ASHES.
+    </p>
+
+    <h2>1. Volume-base por tipo de grupo muscular</h2>
+    <p class="hint">
+      Use o volume que você considera “normal” para o atleta – a calculadora só aplica multiplicadores relativos.
+    </p>
+
+    <div class="grid">
+      <div class="field">
+        <label for="prioritarioBase">Prioritário (séries/semana)</label>
+        <input type="number" id="prioritarioBase" min="0" step="1" value="18" />
+        <div class="hint">Ex.: peitoral, dorsais, quadríceps em foco.</div>
+      </div>
+
+      <div class="field">
+        <label for="neutroBase">Neutro (séries/semana)</label>
+        <input type="number" id="neutroBase" min="0" step="1" value="14" />
+        <div class="hint">Grupos que você quer evoluir, mas sem prioridade total.</div>
+      </div>
+
+      <div class="field">
+        <label for="manutencaoBase">Manutenção (séries/semana)</label>
+        <input type="number" id="manutencaoBase" min="0" step="1" value="8" />
+        <div class="hint">Grupos já à frente, apenas para manter ou subir devagar.</div>
+      </div>
+
+      <div class="field">
+        <label for="nomeProtocolo">Nome do bloco (opcional)</label>
+        <input type="text" id="nomeProtocolo" placeholder="Ex.: Mesociclo Off-Season Q1" />
+        <div class="hint">Só para referência visual na saída.</div>
+      </div>
+    </div>
+
+    <h2>2. Duração das fases (em semanas)</h2>
+    <p class="hint">
+      Ajuste quantas semanas cada fase terá. A lógica da carga/volume já está embutida nos multiplicadores.
+    </p>
+
+    <div class="phases">
+      <div class="phase-card">
+        <div class="phase-title phase-raw">RAW</div>
+        <div>Construção de base, volume abaixo do “normal”, foco em execução.</div>
+        <div class="phase-tag">Base / MEV</div>
+        <div class="field" style="margin-top: 8px;">
+          <label for="semanasRaw">Semanas</label>
+          <input type="number" id="semanasRaw" min="1" step="1" value="3" />
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-title phase-grind">GRIND</div>
+        <div>Volume-base, zona de trabalho principal do mesociclo.</div>
+        <div class="phase-tag">MAV / Base</div>
+        <div class="field" style="margin-top: 8px;">
+          <label for="semanasGrind">Semanas</label>
+          <input type="number" id="semanasGrind" min="1" step="1" value="3" />
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-title phase-slaughter">SLAUGHTER</div>
+        <div>Choque de volume, só para quem está pronto para apanhar.</div>
+        <div class="phase-tag">MRV / Choque</div>
+        <div class="field" style="margin-top: 8px;">
+          <label for="semanasSlaughter">Semanas</label>
+          <input type="number" id="semanasSlaughter" min="1" step="1" value="1" />
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-title phase-ashes">ASHES</div>
+        <div>Deload, volume bem abaixo do normal, mantendo padrão técnico.</div>
+        <div class="phase-tag">MV / Deload</div>
+        <div class="field" style="margin-top: 8px;">
+          <label for="semanasAshes">Semanas</label>
+          <input type="number" id="semanasAshes" min="1" step="1" value="1" />
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="calcularBtn" type="button">
+        <span>Calcular periodização</span>
+      </button>
+      <button id="resetBtn" type="button" class="btn-secondary">
+        Resetar valores
+      </button>
+    </div>
+
+    <div id="results" class="results" style="display:none;">
+      <h2>Resultado da periodização</h2>
+      <p id="resumoProtocolo"></p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Semanas</th>
+            <th>Multiplicador</th>
+            <th>Prioritário<br>(séries/semana)</th>
+            <th>Neutro<br>(séries/semana)</th>
+            <th>Manutenção<br>(séries/semana)</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaResultados"></tbody>
+      </table>
+
+      <p class="footer-note">
+        Os valores são estimativas relativas ao volume-base que você definiu.
+        Ajuste conforme feedback do atleta (performance, recuperação, sinais de fadiga).
+        Todas as séries consideradas <strong>séries efetivas até a falha</strong>, como no padrão de trabalho do AKT.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function calcularPeriodizacao() {
+      const prioritarioBase = parseFloat(document.getElementById("prioritarioBase").value) || 0;
+      const neutroBase = parseFloat(document.getElementById("neutroBase").value) || 0;
+      const manutencaoBase = parseFloat(document.getElementById("manutencaoBase").value) || 0;
+
+      const semanasRaw = parseInt(document.getElementById("semanasRaw").value, 10) || 0;
+      const semanasGrind = parseInt(document.getElementById("semanasGrind").value, 10) || 0;
+      const semanasSlaughter = parseInt(document.getElementById("semanasSlaughter").value, 10) || 0;
+      const semanasAshes = parseInt(document.getElementById("semanasAshes").value, 10) || 0;
+
+      const nomeProtocolo = document.getElementById("nomeProtocolo").value.trim();
+
+      const totalSemanas = semanasRaw + semanasGrind + semanasSlaughter + semanasAshes;
+      if (totalSemanas === 0) {
+        alert("Defina pelo menos 1 semana em alguma fase.");
+        return;
+      }
+
+      // Multiplicadores relativos ao volume-base (GRIND = 1.0)
+      const fases = [
+        {
+          nome: "RAW",
+          tag: "Base / MEV",
+          semanas: semanasRaw,
+          mult: 0.75
+        },
+        {
+          nome: "GRIND",
+          tag: "MAV / Base",
+          semanas: semanasGrind,
+          mult: 1.0
+        },
+        {
+          nome: "SLAUGHTER",
+          tag: "MRV / Choque",
+          semanas: semanasSlaughter,
+          mult: 1.2
+        },
+        {
+          nome: "ASHES",
+          tag: "MV / Deload",
+          semanas: semanasAshes,
+          mult: 0.5
+        }
+      ];
+
+      const corpoTabela = document.getElementById("tabelaResultados");
+      corpoTabela.innerHTML = "";
+
+      fases.forEach(fase => {
+        if (fase.semanas <= 0) return;
+
+        const pri = Math.round(prioritarioBase * fase.mult);
+        const neu = Math.round(neutroBase * fase.mult);
+        const man = Math.round(manutencaoBase * fase.mult);
+
+        const tr = document.createElement("tr");
+
+        const tdFase = document.createElement("td");
+        tdFase.innerHTML = `<strong>${fase.nome}</strong><br><span class="tag-small">${fase.tag}</span>`;
+        tr.appendChild(tdFase);
+
+        const tdSemanas = document.createElement("td");
+        tdSemanas.textContent = fase.semanas;
+        tr.appendChild(tdSemanas);
+
+        const tdMult = document.createElement("td");
+        tdMult.textContent = fase.mult.toFixed(2).replace(".", ",") + "×";
+        tr.appendChild(tdMult);
+
+        const tdPri = document.createElement("td");
+        tdPri.textContent = pri + " séries";
+        tr.appendChild(tdPri);
+
+        const tdNeu = document.createElement("td");
+        tdNeu.textContent = neu + " séries";
+        tr.appendChild(tdNeu);
+
+        const tdMan = document.createElement("td");
+        tdMan.textContent = man + " séries";
+        tr.appendChild(tdMan);
+
+        corpoTabela.appendChild(tr);
+      });
+
+      const resumo = document.getElementById("resumoProtocolo");
+      let textoResumo = `Total de ${totalSemanas} semana(s) distribuídas entre as fases.`;
+      if (nomeProtocolo) {
+        textoResumo = `<strong>${nomeProtocolo}</strong> • ` + textoResumo;
+      }
+      resumo.innerHTML = textoResumo;
+
+      document.getElementById("results").style.display = "block";
+    }
+
+    function resetarValores() {
+      document.getElementById("prioritarioBase").value = 18;
+      document.getElementById("neutroBase").value = 14;
+      document.getElementById("manutencaoBase").value = 8;
+      document.getElementById("semanasRaw").value = 3;
+      document.getElementById("semanasGrind").value = 3;
+      document.getElementById("semanasSlaughter").value = 1;
+      document.getElementById("semanasAshes").value = 1;
+      document.getElementById("nomeProtocolo").value = "";
+      document.getElementById("results").style.display = "none";
+    }
+
+    document.getElementById("calcularBtn").addEventListener("click", calcularPeriodizacao);
+    document.getElementById("resetBtn").addEventListener("click", resetarValores);
+  </script>
+</body>
+</html>
