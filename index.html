@@ -1,78 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>AKT Labs • Índice de Calculadoras</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Índice das calculadoras da AKT Labs para treino, dieta e planejamento." />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AKT Labs • Calculadoras</title>
 
-  <!-- Fonte -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    background: #0b0b12;
+    color: #fff;
+  }
 
-  <style>
-    :root {
-      --bg: #050509;
-      --bg-elevated: #0c0c12;
-      --accent: #ff7a2f;
-      --accent-soft: rgba(255, 122, 47, 0.12);
-      --text: #f5f5f7;
-      --text-muted: #a0a0b3;
-      --border: #262637;
-      --radius-xl: 18px;
-      --radius-pill: 999px;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
-    }
+  .container {
+    max-width: 900px;
+    margin: auto;
+  }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
 
-    body {
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, #141422 0, #050509 55%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 32px 16px;
-    }
+  .sub {
+    color: #bdbdbd;
+    margin-bottom: 30px;
+  }
 
-    .page {
-      width: 100%;
-      max-width: 1080px;
-    }
+  .section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #15151f;
+    border-radius: 10px;
+    border: 1px solid #262637;
+  }
 
-    header {
-      margin-bottom: 32px;
-    }
+  .section h2 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    color: #ff7a2f;
+  }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 14px;
-      border-radius: var(--radius-pill);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
+  .btn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(255, 122, 47, 0.8);
-    }
+  a.btn {
+    text-decoration: none;
+    padding: 12px 15px;
+    background: #1d1d29;
+    color: white;
+    border: 1px solid #333344;
+    border-radius: 8px;
+    transition: 0.2s;
+  }
 
-    h1 {
+  a.btn:hover {
+    background: #ff7a2f;
+    color: #000;
+    border-color: #ff7a2f;
+  }
+</style>
+
+</head>
+<body>
+<div class="container">
+
+  <h1>AKT Labs • Índice de Calculadoras</h1>
+  <p class="sub">Selecione uma das ferramentas abaixo.</p>
+
+  <!-- Nutrição -->
+  <div class="section">
+    <h2>Nutrição / Calorias & Macros</h2>
+    <div class="btn-list">
+
+      <a class="btn" href="gasto-calorico.html">Gasto calórico / TDEE</a>
+      <a class="btn" href="macros-dieta.html">Distribuição de macronutrientes</a>
+      <a class="btn" href="substituicao-alimentos.html">Substituição de alimentos (TACO/USDA)</a>
+      <a class="btn" href="fibra-por-kcal.html">Fibra por 1000 kcal</a>
+
+    </div>
+  </div>
+
+  <!-- Treino -->
+  <div class="section">
+    <h2>Treino / Carga & Volume</h2>
+    <div class="btn-list">
+
+      <a class="btn" href="brzycki-carga.html">Estimativa de carga (Brzycki)</a>
+      <a class="btn" href="volume-treino.html">Volume semanal por grupamento</a>
+      <a class="btn" href="cadencia-intervalos.html">Cadência, intervalos e tempo de sessão</a>
+
+    </div>
+  </div>
+
+  <!-- Coach -->
+  <div class="section">
+    <h2>Ferramentas do Coach</h2>
+    <div class="btn-list">
+
+      <a class="btn" href="checkin-anthro.html">Resumo de check-in / antropometria</a>
+      <a class="btn" href="planner-protocolo.html">Planejador de protocolo</a>
+      <a class="btn" href="helpers-diversos.html">Outros helpers</a>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
       font-size: clamp(26px, 4vw, 32px);
       margin-top: 14px;
       margin-bottom: 8px;
