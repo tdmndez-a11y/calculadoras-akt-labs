@@ -1,77 +1,532 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AKT Labs • Calculadoras</title>
+  <meta charset="UTF-8" />
+  <title>AKT Labs • Índice de Calculadoras</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Índice das calculadoras da AKT Labs para treino, dieta e planejamento." />
 
-<style>
-  body {
-    margin: 0;
-    padding: 40px 20px;
-    font-family: Arial, sans-serif;
-    background: #0b0b12;
-    color: #fff;
-  }
+  <!-- Fonte -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  .container {
-    max-width: 900px;
-    margin: auto;
-  }
+  <style>
+    :root {
+      --bg: #050509;
+      --bg-elevated: #0c0c12;
+      --accent: #ff7a2f;
+      --accent-soft: rgba(255, 122, 47, 0.12);
+      --text: #f5f5f7;
+      --text-muted: #a0a0b3;
+      --border: #262637;
+      --radius-xl: 18px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
 
-  h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .sub {
-    color: #bdbdbd;
-    margin-bottom: 30px;
-  }
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #141422 0, #050509 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+    }
 
-  .section {
-    margin-bottom: 40px;
-    padding: 20px;
-    background: #15151f;
-    border-radius: 10px;
-    border: 1px solid #262637;
-  }
+    .page {
+      width: 100%;
+      max-width: 1080px;
+    }
 
-  .section h2 {
-    margin: 0 0 15px 0;
-    font-size: 20px;
-    color: #ff7a2f;
-  }
+    header {
+      margin-bottom: 32px;
+    }
 
-  .btn-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
 
-  a.btn {
-    text-decoration: none;
-    padding: 12px 15px;
-    background: #1d1d29;
-    color: white;
-    border: 1px solid #333344;
-    border-radius: 8px;
-    transition: 0.2s;
-  }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(255, 122, 47, 0.8);
+    }
 
-  a.btn:hover {
-    background: #ff7a2f;
-    color: #000;
-    border-color: #ff7a2f;
-  }
-</style>
+    h1 {
+      font-size: clamp(26px, 4vw, 32px);
+      margin-top: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
+    h1 span.logo-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, var(--accent), #ffb347);
+      color: #050509;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 540px;
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .link-ghost {
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .link-ghost:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .link-ghost span.icon {
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .cards-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #090912, #050509 55%, #11101a 100%);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(circle at top left, var(--accent-soft), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-header {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #f0f0ff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-pill {
+      width: 8px;
+      height: 20px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent), #ffb347);
+      box-shadow: 0 0 14px rgba(255, 122, 47, 0.85);
+    }
+
+    .card-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 3px 9px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .card-description {
+      position: relative;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .buttons-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .calc-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 10, 0.9);
+      text-decoration: none;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, border-color 0.12s ease-out, background 0.12s ease-out;
+    }
+
+    .calc-btn span.label {
+      text-align: left;
+      flex: 1;
+    }
+
+    .calc-btn span.chevron {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    .calc-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: rgba(15, 15, 25, 0.98);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    }
+
+    .calc-btn.secondary {
+      border-style: dashed;
+      border-color: rgba(255, 255, 255, 0.18);
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 12px;
+    }
+
+    /* Painel lateral (resumo / instruções) */
+    .side-panel {
+      background: radial-gradient(circle at top, #181827 0, #050509 70%);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .side-panel::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(circle at top right, var(--accent-soft), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .side-panel h2 {
+      position: relative;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .side-panel p {
+      position: relative;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .side-list {
+      position: relative;
+      list-style: none;
+      padding-left: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .side-list li {
+      display: flex;
+      gap: 8px;
+    }
+
+    .side-list span.bullet {
+      margin-top: 3px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(255, 122, 47, 0.8);
+      flex-shrink: 0;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: left;
+      max-width: 720px;
+    }
+
+    footer code {
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="page">
+    <header>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        AKT Labs • Calculadoras
+      </div>
 
-  <h1>AKT Labs • Índice de Calculadoras</h1>
-  <p class="sub">Selecione uma das ferramentas abaixo.</p>
+      <h1>
+        Índice de calculadoras
+        <span class="logo-pill">AKT LAB</span>
+      </h1>
+
+      <p class="subtitle">
+        Atalhos rápidos para todas as ferramentas da AKT Labs — treino, dieta, composição corporal e planejamento.
+        Use esse índice como hub principal para abrir cada calculadora.
+      </p>
+
+      <div class="header-actions">
+        <a class="link-ghost" href="https://github.com/tdmndez-a11y/calculadoras-akt-labs" target="_blank" rel="noopener">
+          <span class="icon">💾</span> Ver repositório
+        </a>
+        <a class="link-ghost" href="./">
+          <span class="icon">🔁</span> Recarregar índice
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="cards-column">
+        <!-- BLOCO 1 – NUTRIÇÃO / CALORIAS -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-pill"></span>
+              Nutrição • Calorias & Macros
+            </div>
+            <span class="card-tag">Dieta</span>
+          </div>
+          <p class="card-description">
+            Calculadoras para definir gasto calórico, variações por sexo e distribuição de macronutrientes.
+          </p>
+
+          <div class="buttons-grid">
+            <a class="calc-btn" href="GASTOCALORICO.html">
+              <span class="label">Gasto calórico / TDEE (geral)</span>
+              <span class="chevron">↗</span>
+            </a>
+
+            <a class="calc-btn" href="GASTO_MULHERES.html">
+              <span class="label">Gasto calórico / TDEE – mulheres</span>
+              <span class="chevron">↗</span>
+            </a>
+
+            <a class="calc-btn" href="MACROS.html">
+              <span class="label">Distribuição de macronutrientes</span>
+              <span class="chevron">↗</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- BLOCO 2 – COMPOSIÇÃO CORPORAL & FC -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-pill"></span>
+              Composição corporal & FC
+            </div>
+            <span class="card-tag">Avaliação</span>
+          </div>
+          <p class="card-description">
+            Ferramentas para cálculo de percentual de gordura e parâmetros específicos para mulheres.
+          </p>
+
+          <div class="buttons-grid">
+            <a class="calc-btn" href="BF.html">
+              <span class="label">Cálculo de BF (versão 1)</span>
+              <span class="chevron">↗</span>
+            </a>
+
+            <a class="calc-btn" href="BF_HTM.html">
+              <span class="label">Cálculo de BF (versão 2)</span>
+              <span class="chevron">↗</span>
+            </a>
+
+            <a class="calc-btn" href="FC_MULHERES.html">
+              <span class="label">FC Mulheres</span>
+              <span class="chevron">↗</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- BLOCO 3 – TREINO / CARGA -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-pill"></span>
+              Treino • Carga & Volume
+            </div>
+            <span class="card-tag">Treinamento</span>
+          </div>
+          <p class="card-description">
+            Ferramentas para organizar séries, cargas e volume semanal de treino.
+          </p>
+
+          <div class="buttons-grid">
+            <a class="calc-btn" href="BRZYCKI.html">
+              <span class="label">Estimativa de carga (Brzycki)</span>
+              <span class="chevron">↗</span>
+            </a>
+
+            <a class="calc-btn" href="SEMANAS.html">
+              <span class="label">Volume semanal por grupamento</span>
+              <span class="chevron">↗</span>
+            </a>
+
+            <a class="calc-btn" href="CADENCIA.html">
+              <span class="label">Cadência / intervalos</span>
+              <span class="chevron">↗</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- BLOCO 4 – FERRAMENTAS DO COACH -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-pill"></span>
+              Ferramentas do Coach
+            </div>
+            <span class="card-tag">Gestão</span>
+          </div>
+          <p class="card-description">
+            Utilitário para estruturar protocolos de treino/dieta em fases.
+          </p>
+
+          <div class="buttons-grid">
+            <a class="calc-btn" href="BUILDER.html">
+              <span class="label">Planejador de protocolo (Builder)</span>
+              <span class="chevron">↗</span>
+            </a>
+          </div>
+        </article>
+      </section>
+
+      <!-- PAINEL LATERAL -->
+      <aside class="side-panel">
+        <h2>Como usar esse índice</h2>
+        <p>
+          Cada botão acima abre um arquivo <code>.html</code> deste repositório.
+          Se você adicionar novas calculadoras, basta criar o arquivo e incluir um novo botão aqui.
+        </p>
+
+        <ul class="side-list">
+          <li>
+            <span class="bullet"></span>
+            <span>Os nomes em <code>href</code> precisam ser idênticos aos arquivos (respeitando MAIÚSCULAS).</span>
+          </li>
+          <li>
+            <span class="bullet"></span>
+            <span>Você pode duplicar qualquer card para criar novas categorias de ferramentas.</span>
+          </li>
+          <li>
+            <span class="bullet"></span>
+            <span>Esse índice pode ser o hub oficial para clientes acessarem as calculadoras da AKT Labs.</span>
+          </li>
+        </ul>
+      </aside>
+    </main>
+
+    <footer>
+      <p>
+        <strong>Nota técnica:</strong> Este índice mostra apenas as calculadoras que estão hoje no repositório:
+        <code>GASTOCALORICO</code>, <code>GASTO_MULHERES</code>, <code>MACROS</code>, <code>BF</code>, <code>BF_HTM</code>,
+        <code>FC_MULHERES</code>, <code>BRZYCKI</code>, <code>SEMANAS</code>, <code>CADENCIA</code> e <code>BUILDER</code>.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
 
   <!-- Nutrição -->
   <div class="section">
