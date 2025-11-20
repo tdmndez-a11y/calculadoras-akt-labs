@@ -256,6 +256,56 @@
       font-size: 0.75rem;
       color: #8f90a8;
     }
+
+    /* Lista de músculos */
+    .muscle-list {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    .muscle-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #151724;
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: 1px solid #26283a;
+    }
+
+    .muscle-item input {
+      accent-color: #ff8c42;
+    }
+
+    .muscle-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #ff8c42;
+      font-size: 0.7rem;
+      margin-right: 6px;
+      margin-top: 4px;
+      background: rgba(255, 140, 66, 0.08);
+      color: #ffd1a3;
+    }
+
+    .muscle-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #ff8c42;
+      margin-right: 4px;
+    }
+
+    .muscle-limit-hint {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #ffb347;
+    }
   </style>
 </head>
 <body>
@@ -280,7 +330,7 @@
       <div class="field">
         <label for="prioritarioBase">Prioritário (séries/semana)</label>
         <input type="number" id="prioritarioBase" min="0" step="1" value="18" />
-        <div class="hint">Ex.: peitoral, dorsais, quadríceps em foco.</div>
+        <div class="hint">Ex.: grupos em foco (peito, dorsais, quadríceps etc.).</div>
       </div>
 
       <div class="field">
@@ -299,6 +349,69 @@
         <label for="nomeProtocolo">Nome do bloco (opcional)</label>
         <input type="text" id="nomeProtocolo" placeholder="Ex.: Mesociclo Off-Season Q1" />
         <div class="hint">Só para referência visual na saída.</div>
+      </div>
+    </div>
+
+    <!-- NOVO BLOCO: seleção de músculos prioritários -->
+    <h2>1.1 Seleção de grupos prioritários</h2>
+    <p class="hint">
+      Escolha até <strong>3 grupos musculares</strong> como prioritários para esse bloco. Eles aparecerão como tags no resultado.
+    </p>
+
+    <div class="field">
+      <label>Grupos musculares prioritários (máx. 3)</label>
+      <div class="muscle-list" id="muscleList">
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Peito">
+          <span>Peito</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Costas">
+          <span>Costas</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Deltóides">
+          <span>Deltóides</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Bíceps">
+          <span>Bíceps</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Tríceps">
+          <span>Tríceps</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Trapézio">
+          <span>Trapézio</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Quadríceps">
+          <span>Quadríceps</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Posterior de coxa">
+          <span>Posterior de coxa</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Glúteos">
+          <span>Glúteos</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Panturrilhas">
+          <span>Panturrilhas</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Abdômen">
+          <span>Abdômen</span>
+        </label>
+        <label class="muscle-item">
+          <input type="checkbox" class="muscle-checkbox" value="Antebraços">
+          <span>Antebraços</span>
+        </label>
+      </div>
+      <div class="muscle-limit-hint" id="muscleLimitHint" style="display:none;">
+        Máximo de 3 grupos prioritários selecionados.
       </div>
     </div>
 
@@ -361,6 +474,7 @@
     <div id="results" class="results" style="display:none;">
       <h2>Resultado da periodização</h2>
       <p id="resumoProtocolo"></p>
+      <div id="muscleTagsResultado"></div>
 
       <table>
         <thead>
@@ -385,6 +499,23 @@
   </div>
 
   <script>
+    // Limite de 3 músculos prioritários
+    const muscleCheckboxes = document.querySelectorAll(".muscle-checkbox");
+    const muscleLimitHint = document.getElementById("muscleLimitHint");
+
+    muscleCheckboxes.forEach(cb => {
+      cb.addEventListener("change", function () {
+        const selecionados = Array.from(muscleCheckboxes).filter(x => x.checked);
+        if (selecionados.length > 3) {
+          this.checked = false;
+          muscleLimitHint.style.display = "block";
+          setTimeout(() => {
+            muscleLimitHint.style.display = "none";
+          }, 2000);
+        }
+      });
+    });
+
     function calcularPeriodizacao() {
       const prioritarioBase = parseFloat(document.getElementById("prioritarioBase").value) || 0;
       const neutroBase = parseFloat(document.getElementById("neutroBase").value) || 0;
@@ -402,6 +533,11 @@
         alert("Defina pelo menos 1 semana em alguma fase.");
         return;
       }
+
+      // Coleta músculos prioritários selecionados
+      const musculosPrioritarios = Array.from(muscleCheckboxes)
+        .filter(x => x.checked)
+        .map(x => x.value);
 
       // Multiplicadores relativos ao volume-base (GRIND = 1.0)
       const fases = [
@@ -477,6 +613,23 @@
       }
       resumo.innerHTML = textoResumo;
 
+      // Renderiza tags de músculos prioritários
+      const muscleTagsContainer = document.getElementById("muscleTagsResultado");
+      muscleTagsContainer.innerHTML = "";
+      if (musculosPrioritarios.length > 0) {
+        const titulo = document.createElement("p");
+        titulo.className = "hint";
+        titulo.textContent = "Grupos prioritários deste bloco:";
+        muscleTagsContainer.appendChild(titulo);
+
+        musculosPrioritarios.forEach(musculo => {
+          const span = document.createElement("span");
+          span.className = "muscle-tag";
+          span.innerHTML = `<span class="muscle-tag-dot"></span>${musculo}`;
+          muscleTagsContainer.appendChild(span);
+        });
+      }
+
       document.getElementById("results").style.display = "block";
     }
 
@@ -489,6 +642,10 @@
       document.getElementById("semanasSlaughter").value = 1;
       document.getElementById("semanasAshes").value = 1;
       document.getElementById("nomeProtocolo").value = "";
+
+      // Desmarca músculos
+      muscleCheckboxes.forEach(cb => cb.checked = false);
+      document.getElementById("muscleTagsResultado").innerHTML = "";
       document.getElementById("results").style.display = "none";
     }
 
