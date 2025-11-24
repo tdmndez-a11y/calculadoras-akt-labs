@@ -134,7 +134,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
   background:linear-gradient(180deg,#f97316,#fb923c);color:#1a1008;font-weight:700;
 }
 
-/* BLOCO DO GRÁFICO DE MACROS */
+/* BLOCO DO GRÁFICO COMPARATIVO */
 .chart-box{
   margin-top:10px;
   padding:10px 10px 8px;
@@ -172,12 +172,12 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
   background:#020617;
 }
 .legend-dot{
-  width:8px;
-  height:8px;
+  width:10px;
+  height:10px;
   border-radius:999px;
 }
-.legend-train .legend-dot{background:#f97316;} /* Treino */
-.legend-rest .legend-dot{background:#38bdf8;}  /* Descanso */
+.legend-train .legend-dot{background:#22c55e;}   /* dia de treino */
+.legend-rest  .legend-dot{background:#f97316;}   /* dia de descanso */
 
 @media print{
   body{background:#fff;color:#000}
@@ -196,7 +196,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
     </div>
     <div>
       <h1>Calculadora de Macros por Objetivo — AKT Labs</h1>
-      <div class="sub">Realtime (sem botão) · BMR (Katch/Mifflin/Harris) · NEAT · Presets · Carb cycling · Fibras</div>
+      <div class="sub">Realtime · BMR (Katch/Mifflin/Harris) · NEAT · Presets · Carb cycling · Fibras</div>
     </div>
   </header>
 
@@ -259,8 +259,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
         </div>
         <div>
           <label>NEAT (ajuste fino — movimentos do dia)</label>
-          <input id="neat" type="range" min="-15" max="15" step="1" value="0"
-                 oninput="document.getElementById('neatVal').textContent=this.value+'%'"/>
+          <input id="neat" type="range" min="-15" max="15" step="1" value="0"/>
           <div class="flex-between"><span>menos movimentação</span><span>mais movimentação</span></div>
           <div class="small">Ajuste atual: <span id="neatVal">0%</span></div>
         </div>
@@ -281,8 +280,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
         </div>
         <div>
           <label>Velocidade de mudança (kg/semana)</label>
-          <input id="rate" type="range" min="-1.50" max="1.00" step="0.05" value="-1.00"
-                 oninput="document.getElementById('rateVal').textContent=this.value+' kg/sem'"/>
+          <input id="rate" type="range" min="-1.50" max="1.00" step="0.05" value="-1.00"/>
           <div class="small">Atual: <span id="rateVal">-1.00 kg/sem</span></div>
         </div>
       </div>
@@ -294,9 +292,8 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
         </div>
         <div>
           <label>Carb cycling — ajuste no dia de treino</label>
-          <input id="trainCarbAdj" type="range" min="0" max="30" step="1" value="15"
-                 oninput="document.getElementById('carbAdjVal').textContent='+'+this.value+'% C (treino)'"/>
-          <div class="small">Atual: <span id="carbAdjVal">+15% C (treino)</span></div>
+          <input id="trainCarbAdj" type="range" min="0" max="30" step="1" value="0"/>
+          <div class="small">Atual: <span id="carbAdjVal">+0% C (treino)</span></div>
         </div>
       </div>
 
@@ -338,9 +335,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
             <option value="fixed12">12 g / 1000 kcal (fixo)</option>
           </select>
         </div>
-        <div class="inline" style="align-items:flex-end">
-          <!-- Botões de perfil e PDF removidos -->
-        </div>
+        <div><!-- espaço vazio, sem botões de perfil/PDF --></div>
       </div>
 
       <div id="alerts" style="margin-top:10px"></div>
@@ -354,15 +349,15 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
       <div class="kpi"><div>TDEE</div><div class="v"><span id="tdeeOut">—</span> kcal</div></div>
       <div class="kpi"><div>Meta calórica (base)</div><div class="v"><span id="kcalTarget">—</span> kcal</div></div>
 
-      <!-- GRÁFICO ÚNICO COMPARANDO DIAS -->
+      <!-- GRÁFICO COMPARATIVO TREINO x DESCANSO -->
       <div class="chart-box">
-        <h3>Comparação dos dias (kcal por macro)</h3>
+        <h3>Comparação de macros — Treino x Descanso (g)</h3>
         <div class="chart-wrapper">
-          <canvas id="macroChart" width="280" height="180"></canvas>
+          <canvas id="macroChart" width="280" height="200"></canvas>
         </div>
         <div class="chart-legend">
-          <span class="legend-item legend-train"><span class="legend-dot"></span>Treino</span>
-          <span class="legend-item legend-rest"><span class="legend-dot"></span>Descanso</span>
+          <span class="legend-item legend-train"><span class="legend-dot"></span>Dia de treino</span>
+          <span class="legend-item legend-rest"><span class="legend-dot"></span>Dia de descanso</span>
         </div>
       </div>
 
@@ -435,111 +430,92 @@ function fiberTarget(kcal, mode){
   return {min:Math.round(min), max:Math.round(max)};
 }
 
-/* ---- GRÁFICO DE BARRAS (TREINO x DESCANSO) ---- */
+/* ---- GRÁFICO COMPARATIVO (BARRAS AGRUPADAS) ---- */
 let macroChartCtx = null;
 function initMacroChart(){
   const canvas = document.getElementById('macroChart');
   if(!canvas) return;
   macroChartCtx = canvas.getContext('2d');
 }
-function drawCompareChart(train, rest){
+
+function drawMacroChartCompare(P, C_train, F_train, C_rest, F_rest){
   if(!macroChartCtx) return;
   const ctx = macroChartCtx;
   const canvas = ctx.canvas;
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // train/rest: {P,C,F} em g -> kcal
-  const tK = [
-    train.P*4,
-    train.C*4,
-    train.F*9
-  ];
-  const rK = [
-    rest.P*4,
-    rest.C*4,
-    rest.F*9
-  ];
-  if(!tK.every(v=>isFinite(v)) || !rK.every(v=>isFinite(v))) return;
-
+  // Valores em gramas para cada macro nos 2 dias
+  const train = [P, C_train, F_train];
+  const rest  = [P, C_rest,  F_rest ];
   const labels = ['P','C','G'];
-  const allVals = tK.concat(rK);
-  let maxVal = Math.max(...allVals);
-  if(maxVal <= 0) return;
-  maxVal *= 1.15;
 
-  const w = canvas.width;
-  const h = canvas.height;
-  const marginLeft = 26;
-  const marginRight = 8;
-  const marginTop = 10;
-  const marginBottom = 22;
+  const allVals = train.concat(rest).filter(v=>isFinite(v) && v>0);
+  if(!allVals.length) return;
+  const maxVal = Math.max(...allVals) * 1.15;
 
-  const chartW = w - marginLeft - marginRight;
-  const chartH = h - marginTop - marginBottom;
-  const baseY = marginTop + chartH;
-  const scale = chartH / maxVal;
+  const padding = 24;
+  const chartBottom = canvas.height - 26;
+  const chartTop = padding;
+  const chartHeight = chartBottom - chartTop;
+  const chartLeft = padding;
+  const chartRight = canvas.width - padding;
+  const chartWidth = chartRight - chartLeft;
 
-  // Eixo
-  ctx.strokeStyle = '#4b5563';
+  const groupCount = labels.length;
+  const groupWidth = chartWidth / groupCount;
+  const barWidth = groupWidth * 0.28;
+  const gapBars = groupWidth * 0.08;
+
+  // Eixo X
+  ctx.strokeStyle = '#1f2933';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(marginLeft, baseY);
-  ctx.lineTo(w-marginRight, baseY);
+  ctx.moveTo(chartLeft, chartBottom+0.5);
+  ctx.lineTo(chartRight, chartBottom+0.5);
   ctx.stroke();
 
-  // Grid horizontal leve
-  ctx.font = '9px system-ui, -apple-system';
-  ctx.fillStyle = '#9ca3af';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  const steps = 3;
-  for(let i=1;i<=steps;i++){
-    const val = maxVal*i/steps;
-    const y = baseY - val*scale;
-    ctx.strokeStyle = 'rgba(148,163,184,0.25)';
+  // Função altura
+  const h = (val)=> chartBottom - (val/maxVal)*chartHeight;
+
+  for(let i=0;i<groupCount;i++){
+    const groupCenter = chartLeft + groupWidth*(i+0.5);
+    const xTrain = groupCenter - barWidth/2 - gapBars/2;
+    const xRest  = groupCenter + barWidth/2 + gapBars/2;
+
+    const tVal = train[i] || 0;
+    const rVal = rest[i]  || 0;
+    const yTrain = h(tVal);
+    const yRest  = h(rVal);
+
+    // Treino
+    ctx.fillStyle = '#22c55e';
     ctx.beginPath();
-    ctx.moveTo(marginLeft, y);
-    ctx.lineTo(w-marginRight, y);
-    ctx.stroke();
-    ctx.fillText(Math.round(val), marginLeft-4, y);
-  }
+    ctx.roundRect(xTrain, yTrain, barWidth, chartBottom - yTrain, 3);
+    ctx.fill();
 
-  const groupWidth = chartW / labels.length;
-  const barWidth = groupWidth * 0.25;
-  const gap = barWidth * 0.3;
-
-  // Barras
-  labels.forEach((lab, i)=>{
-    const centerX = marginLeft + groupWidth*(i+0.5);
-
-    // Treino (laranja) - à esquerda
-    const tVal = tK[i];
-    const tH = tVal * scale;
-    const tX = centerX - barWidth/2 - gap/2;
-    const tY = baseY - tH;
+    // Descanso
     ctx.fillStyle = '#f97316';
     ctx.beginPath();
-    ctx.roundRect(tX, tY, barWidth, tH, 3);
+    ctx.roundRect(xRest, yRest, barWidth, chartBottom - yRest, 3);
     ctx.fill();
 
-    // Descanso (azul) - à direita
-    const rVal = rK[i];
-    const rH = rVal * scale;
-    const rX = centerX + gap/2;
-    const rY = baseY - rH;
-    ctx.fillStyle = '#38bdf8';
-    ctx.beginPath();
-    ctx.roundRect(rX, rY, barWidth, rH, 3);
-    ctx.fill();
-
-    // Label P/C/G
+    // Label embaixo
     ctx.fillStyle = '#e5e7eb';
+    ctx.font = '11px system-ui, -apple-system, BlinkMacSystemFont';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(lab, centerX, baseY+4);
-  });
+    ctx.fillText(labels[i], groupCenter, chartBottom+4);
+  }
+
+  // Título pequeno das unidades
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '10px system-ui, -apple-system, BlinkMacSystemFont';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('g', chartRight, chartTop-6);
 }
 
+/* ---- CÁLCULO PRINCIPAL ---- */
 function calculate(){
   const sex = $('#sex').value;
   const age = parseFloat($('#age').value||0);
@@ -552,7 +528,7 @@ function calculate(){
   const goal = $('#goal').value;
   const rateKg = parseFloat($('#rate').value);
   const trainDays = clamp(parseInt($('#trainDays').value||0),0,7);
-  const carbAdj = parseFloat($('#trainCarbAdj').value)/100;
+  const carbAdj = parseFloat($('#trainCarbAdj').value||0)/100;
   const carbDistrib = $('#carbDistrib').value;
   const meals = clamp(parseInt($('#meals').value||4),2,8);
   const fiberMode = $('#fiberMode').value;
@@ -680,14 +656,14 @@ function calculate(){
     mealRows.appendChild(tr);
   }
 
-  // TOTAIS
+  // TOTAIS / TABELA
   $('#bmrOut').textContent  = isFinite(bmr)? round(bmr) : '—';
   $('#tdeeOut').textContent = isFinite(tdee)? round(tdee) : '—';
   $('#kcalTarget').textContent = isFinite(kcalTarget)? round(kcalTarget) : '—';
 
   const rows = [
-    {name:'Treino',   kcal:kcalTarget,     P:P, C:C_train, F:F_train, fiber:fiberTrain},
-    {name:'Descanso', kcal:kcalRestTarget, P:P, C:C_rest,  F:F_rest,  fiber:fiberRest},
+    {name:'Treino',   kcal:kcalTarget,    P:P, C:C_train, F:F_train, fiber:fiberTrain},
+    {name:'Descanso', kcal:kcalRestTarget,P:P, C:C_rest,  F:F_rest,  fiber:fiberRest},
   ];
   const tb = $('#macroRows'); tb.innerHTML='';
   for(const r of rows){
@@ -703,11 +679,8 @@ function calculate(){
     tb.appendChild(tr);
   }
 
-  // Gráfico comparando dias
-  drawCompareChart(
-    {P:P, C:C_train, F:F_train},
-    {P:P, C:C_rest,  F:F_rest}
-  );
+  // GRÁFICO COMPARATIVO
+  drawMacroChartCompare(P, C_train, F_train, C_rest, F_rest);
 
   const alerts = [];
   if(F < 0.6*weight) alerts.push('Gordura ficou abaixo de 0,6 g/kg (ajuste feito automaticamente).');
@@ -717,46 +690,82 @@ function calculate(){
     : `<div class="ok">Cálculo atualizado em tempo real.</div>`;
 }
 
-// Reatividade
-function debounce(fn, ms){
-  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); };
-}
-const debouncedCalc = debounce(calculate, 200);
-
+/* ---- EVENTOS / REATIVIDADE ---- */
 function attachRealtime(){
   const root = document.getElementById('formRoot');
+
+  // Input direto = realtime
   root.addEventListener('input', (e)=>{
-    if(e.target.id==='neat') document.getElementById('neatVal').textContent=e.target.value+'%';
-    if(e.target.id==='rate') document.getElementById('rateVal').textContent=e.target.value+' kg/sem';
-    if(e.target.id==='trainCarbAdj') document.getElementById('carbAdjVal').textContent = '+'+e.target.value+'% C (treino)';
-    debouncedCalc();
+    const id = e.target.id;
+    if(id === 'neat'){
+      document.getElementById('neatVal').textContent = e.target.value + '%';
+    }
+    if(id === 'rate'){
+      document.getElementById('rateVal').textContent = e.target.value + ' kg/sem';
+    }
+    if(id === 'trainCarbAdj'){
+      document.getElementById('carbAdjVal').textContent = '+' + e.target.value + '% C (treino)';
+    }
+    calculate();
   });
+
   root.addEventListener('change', (e)=>{
     if(e.target.id==='bmrFormula'){
       const showBF = e.target.value==='katch';
       document.getElementById('bfWrap').classList.toggle('hidden', !showBF);
     }
+
     if(e.target.id==='goal'){
+      // rate default por objetivo
       const kg = defaultRateKg(e.target.value);
       const rate = document.getElementById('rate');
       rate.value = kg.toFixed(2);
       document.getElementById('rateVal').textContent = rate.value+' kg/sem';
+
+      // reset NEAT
+      const neat = document.getElementById('neat');
+      neat.value = 0;
+      document.getElementById('neatVal').textContent = '0%';
+
+      // reset carb cycling
+      const carb = document.getElementById('trainCarbAdj');
+      carb.value = 0;
+      document.getElementById('carbAdjVal').textContent = '+0% C (treino)';
     }
-    debouncedCalc();
+
+    calculate();
   });
+
+  // Toggle distribuição carb (Equilibrado vs Avançado)
+  const eq = document.getElementById('distEq');
+  const av = document.getElementById('distAv');
+  const hidden = document.getElementById('carbDistrib');
+
+  function setMode(mode){
+    hidden.value = mode;
+    eq.classList.toggle('active', mode==='equilibrado');
+    av.classList.toggle('active', mode==='avancado');
+    calculate();
+  }
+
+  eq.addEventListener('click', ()=>setMode('equilibrado'));
+  av.addEventListener('click', ()=>setMode('avancado'));
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
   initMacroChart();
+
+  // Inicializa labels
   document.getElementById('neatVal').textContent=(document.getElementById('neat').value||0)+'%';
   const g = document.getElementById('goal').value;
   const kg = defaultRateKg(g);
   const rate = document.getElementById('rate');
   rate.value = kg.toFixed(2);
   document.getElementById('rateVal').textContent = rate.value+' kg/sem';
-  document.getElementById('carbAdjVal').textContent = '+'+(document.getElementById('trainCarbAdj').value||0)+'% C (treino)';
+  document.getElementById('carbAdjVal').textContent = '+0% C (treino)';
   const formulaSel = document.getElementById('bmrFormula').value;
   document.getElementById('bfWrap').classList.toggle('hidden', formulaSel!=='katch');
+
   attachRealtime();
   calculate();
 });
