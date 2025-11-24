@@ -17,12 +17,9 @@ body{
   font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
   background:radial-gradient(circle at top left,#111827 0,#020617 55%);
   color:var(--ink);
-  display:flex;
-  justify-content:center;
-  padding:16px;
 }
 
-/* CONTAINER ESTILO "APP" (igual vibe da Brzycki) */
+/* CONTAINER ESTILO "APP" */
 .wrapper{
   width:100%;
   max-width:960px;
@@ -31,11 +28,16 @@ body{
   padding:18px;
   border:1px solid #1f2937;
   box-shadow:0 18px 40px rgba(0,0,0,.6);
+  margin:16px auto;
 }
 @media (max-width:700px){
   .wrapper{
+    margin:0;
+    max-width:100%;
     padding:14px;
-    border-radius:14px;
+    border-radius:0;
+    border:none;
+    box-shadow:none;
   }
 }
 
@@ -132,7 +134,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
   background:linear-gradient(180deg,#f97316,#fb923c);color:#1a1008;font-weight:700;
 }
 
-/* BLOCO DO GRÁFICO DE MACROS */
+/* BLOCO DO GRÁFICO COMPARATIVO */
 .chart-box{
   margin-top:10px;
   padding:10px 10px 8px;
@@ -174,13 +176,12 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
   height:8px;
   border-radius:999px;
 }
-.legend-p .legend-dot{background:#38bdf8;}   /* Proteína */
-.legend-c .legend-dot{background:#f97316;}   /* Carbo */
-.legend-f .legend-dot{background:#facc15;}   /* Gordura */
+.legend-train .legend-dot{background:#f97316;}   /* Treino */
+.legend-rest  .legend-dot{background:#38bdf8;}   /* Descanso */
 
 @media print{
-  body{background:#fff;color:#000;padding:0}
-  .wrapper{box-shadow:none;border-color:#ccc;border-radius:0}
+  body{background:#fff;color:#000}
+  .wrapper{box-shadow:none;border-color:#ccc;border-radius:0;margin:0}
   .card{box-shadow:none;border-color:#ccc}
   .btn,.small,.sub,.chart-box,footer{display:none!important}
   a[href]:after{content:""}
@@ -195,7 +196,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
     </div>
     <div>
       <h1>Calculadora de Macros por Objetivo — AKT Labs</h1>
-      <div class="sub">Realtime (sem botão) · BMR (Katch/Mifflin/Harris) · NEAT · Presets · Carb cycling · Fibras · PDF</div>
+      <div class="sub">Realtime (sem botão) · BMR (Katch/Mifflin/Harris) · NEAT · Presets · Carb cycling · Fibras</div>
     </div>
   </header>
 
@@ -329,21 +330,6 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
         <div class="small">Se vazio, usa os presets do objetivo.</div>
       </details>
 
-      <div class="row" style="margin-top:8px">
-        <div>
-          <label>Modo de fibra</label>
-          <select id="fiberMode">
-            <option value="range" selected>10–14 g / 1000 kcal (recomendado)</option>
-            <option value="fixed12">12 g / 1000 kcal (fixo)</option>
-          </select>
-        </div>
-        <div class="inline" style="align-items:flex-end">
-          <button class="btn" id="saveBtn">Salvar perfil</button>
-          <button class="btn" id="loadBtn">Carregar perfil</button>
-          <button class="btn" onclick="window.print()">Salvar PDF</button>
-        </div>
-      </div>
-
       <div id="alerts" style="margin-top:10px"></div>
     </section>
 
@@ -355,16 +341,15 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
       <div class="kpi"><div>TDEE</div><div class="v"><span id="tdeeOut">—</span> kcal</div></div>
       <div class="kpi"><div>Meta calórica (base)</div><div class="v"><span id="kcalTarget">—</span> kcal</div></div>
 
-      <!-- GRÁFICO DE MACROS (DIA DE TREINO) -->
+      <!-- GRÁFICO COMPARATIVO TREINO x DESCANSO -->
       <div class="chart-box">
-        <h3>Distribuição de macros (dia de treino)</h3>
+        <h3>Comparação treino × descanso (kcal por macro)</h3>
         <div class="chart-wrapper">
           <canvas id="macroChart" width="260" height="180"></canvas>
         </div>
         <div class="chart-legend">
-          <span class="legend-item legend-p"><span class="legend-dot"></span>Proteína</span>
-          <span class="legend-item legend-c"><span class="legend-dot"></span>Carboidratos</span>
-          <span class="legend-item legend-f"><span class="legend-dot"></span>Gorduras</span>
+          <span class="legend-item legend-train"><span class="legend-dot"></span>Dia de treino</span>
+          <span class="legend-item legend-rest"><span class="legend-dot"></span>Dia de descanso</span>
         </div>
       </div>
 
@@ -437,65 +422,133 @@ function fiberTarget(kcal, mode){
   return {min:Math.round(min), max:Math.round(max)};
 }
 
-/* ---- GRÁFICO DE MACROS (DIA DE TREINO) ---- */
+/* ---- GRÁFICO BARRAS AGRUPADAS TREINO x DESCANSO ---- */
 let macroChartCtx = null;
 function initMacroChart(){
   const canvas = document.getElementById('macroChart');
   if(!canvas) return;
   macroChartCtx = canvas.getContext('2d');
 }
-function drawMacroChart(pGrams, cGrams, fGrams){
+function drawMacroChart(P, C_train, F_train, C_rest, F_rest){
   if(!macroChartCtx) return;
   const ctx = macroChartCtx;
   const canvas = ctx.canvas;
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const kcalP = pGrams*4;
-  const kcalC = cGrams*4;
-  const kcalF = fGrams*9;
-  const total = kcalP + kcalC + kcalF;
-  if(!isFinite(total) || total<=0) return;
+  // kcal por macro
+  const kP_train = P*4;
+  const kC_train = C_train*4;
+  const kF_train = F_train*9;
+  const kP_rest  = P*4;
+  const kC_rest  = C_rest*4;
+  const kF_rest  = F_rest*9;
 
-  const data = [
-    {value:kcalP, color:'#38bdf8'},  // Proteína
-    {value:kcalC, color:'#f97316'},  // Carbo
-    {value:kcalF, color:'#facc15'}   // Gordura
+  if(!isFinite(kP_train + kC_train + kF_train + kP_rest + kC_rest + kF_rest) ||
+     (kP_train + kC_train + kF_train + kP_rest + kC_rest + kF_rest) <= 0){
+    return;
+  }
+
+  const groups = [
+    {label:'P', train:kP_train, rest:kP_rest},
+    {label:'C', train:kC_train, rest:kC_rest},
+    {label:'G', train:kF_train, rest:kF_rest}
   ];
 
-  const cx = canvas.width/2;
-  const cy = canvas.height/2;
-  const radius = Math.min(cx,cy) - 8;
-  let start = -Math.PI/2;
+  const maxVal = Math.max(...groups.flatMap(g=>[g.train,g.rest])) || 1;
 
-  data.forEach(d=>{
-    const angle = (d.value/total)*Math.PI*2;
+  const paddingLeft = 26;
+  const paddingRight = 10;
+  const paddingTop = 10;
+  const paddingBottom = 24;
+
+  const chartWidth = canvas.width - paddingLeft - paddingRight;
+  const chartHeight = canvas.height - paddingTop - paddingBottom;
+
+  const nGroups = groups.length;
+  const groupWidth = chartWidth / nGroups;
+  const barWidth = groupWidth * 0.32;
+  const gapBars = groupWidth * 0.10;
+
+  // eixo Y
+  ctx.strokeStyle = '#4b5563';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, paddingTop);
+  ctx.lineTo(paddingLeft, paddingTop + chartHeight);
+  ctx.stroke();
+
+  // eixo X
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, paddingTop + chartHeight);
+  ctx.lineTo(paddingLeft + chartWidth, paddingTop + chartHeight);
+  ctx.stroke();
+
+  // linhas horizontais (grid leve)
+  ctx.strokeStyle = '#1f2933';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([3,3]);
+  const steps = 3;
+  for(let i=1;i<=steps;i++){
+    const y = paddingTop + chartHeight - (chartHeight*(i/steps));
     ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,radius,start,start+angle);
-    ctx.closePath();
-    ctx.fillStyle = d.color;
-    ctx.fill();
-    start += angle;
+    ctx.moveTo(paddingLeft, y);
+    ctx.lineTo(paddingLeft + chartWidth, y);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // barras
+  groups.forEach((g,idx)=>{
+    const baseX = paddingLeft + idx*groupWidth + groupWidth/2;
+
+    // treino
+    const hTrain = (g.train / maxVal) * chartHeight;
+    const xTrain = baseX - barWidth/2 - gapBars/2;
+    const yTrain = paddingTop + chartHeight - hTrain;
+
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(xTrain, yTrain, barWidth, hTrain);
+
+    // descanso
+    const hRest = (g.rest / maxVal) * chartHeight;
+    const xRest = baseX + gapBars/2;
+    const yRest = paddingTop + chartHeight - hRest;
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(xRest, yRest, barWidth, hRest);
+
+    // label do grupo (P/C/G)
+    ctx.fillStyle = '#e5e7eb';
+    ctx.font = '11px system-ui, -apple-system, BlinkMacSystemFont';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(g.label, baseX, paddingTop + chartHeight + 4);
   });
 
-  // Donut
-  ctx.beginPath();
-  ctx.arc(cx,cy,radius*0.55,0,Math.PI*2);
-  ctx.fillStyle = '#020617';
-  ctx.fill();
-
-  // Percentuais
-  const percP = Math.round(kcalP/total*100);
-  const percC = Math.round(kcalC/total*100);
-  const percF = 100 - percP - percC;
-
-  ctx.fillStyle = '#e5e7eb';
-  ctx.font = '12px system-ui, -apple-system, BlinkMacSystemFont';
+  // rótulos de valor no topo das barras (em kcal, arredondado)
+  ctx.font = '10px system-ui, -apple-system, BlinkMacSystemFont';
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`${percP}% P`, cx, cy-16);
-  ctx.fillText(`${percC}% C`, cx, cy);
-  ctx.fillText(`${percF}% G`, cx, cy+16);
+  ctx.textBaseline = 'bottom';
+
+  groups.forEach((g,idx)=>{
+    const baseX = paddingLeft + idx*groupWidth + groupWidth/2;
+
+    const hTrain = (g.train / maxVal) * chartHeight;
+    const xTrain = baseX - barWidth/2 - gapBars/2 + barWidth/2;
+    const yTrain = paddingTop + chartHeight - hTrain - 2;
+    if(hTrain > 8){
+      ctx.fillStyle = '#f97316';
+      ctx.fillText(Math.round(g.train), xTrain, yTrain);
+    }
+
+    const hRest = (g.rest / maxVal) * chartHeight;
+    const xRest = baseX + gapBars/2 + barWidth/2;
+    const yRest = paddingTop + chartHeight - hRest - 2;
+    if(hRest > 8){
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(Math.round(g.rest), xRest, yRest);
+    }
+  });
 }
 
 function calculate(){
@@ -508,7 +561,7 @@ function calculate(){
   const activity = parseFloat($('#activity').value);
   const neat = parseFloat($('#neat').value||0) / 100;
   const goal = $('#goal').value;
-  const rateKg = parseFloat($('#rate').value); // kg/sem
+  const rateKg = parseFloat($('#rate').value);
   const trainDays = clamp(parseInt($('#trainDays').value||0),0,7);
   const carbAdj = parseFloat($('#trainCarbAdj').value)/100;
   const carbDistrib = $('#carbDistrib').value;
@@ -535,12 +588,10 @@ function calculate(){
   // TDEE
   let tdee = bmr * activity * (1 + neat);
 
-  // Déficit/superávit via velocidade em kg/semana
-  const kgWeek = rateKg; // já em kg/sem
+  const kgWeek = rateKg;
   const deltaDay = (kgWeek * 7700) / 7;
   const kcalTarget = tdee + deltaDay;
 
-  // Macros base (dia genérico)
   let P = clamp(p_kg * weight, 1.6*weight, 3.0*weight);
   let F = Math.max(f_kg * weight, 0.6*weight);
   let C = Math.max(0, (kcalTarget - (P*4 + F*9))/4);
@@ -563,7 +614,7 @@ function calculate(){
     }
   }
 
-  // ----- TREINO: carb-cycling -----
+  // TREINO
   let C_train = C * (1 + carbAdj);
   let F_train = F;
   {
@@ -575,25 +626,22 @@ function calculate(){
     if(Math.abs(C_train_fix - C_train) > 0.5) C_train = C_train_fix;
   }
 
-  // ----- DESCANSO: carb-cycling e -10% kcal -----
+  // DESCANSO
   let C_rest = C * (1 - carbAdj);
-  let F_rest = F + ((C - C_rest)*4)/9; // compensa com gordura a retirada de C
-  const kcalRestTarget = kcalTarget * 0.90; // -10% no descanso
+  let F_rest = F + ((C - C_rest)*4)/9;
+  const kcalRestTarget = kcalTarget * 0.90;
   let kcalRestNow = P*4 + F_rest*9 + C_rest*4;
   if(kcalRestNow > kcalRestTarget){
-    // reduzir preferencialmente carbo
     let need = kcalRestNow - kcalRestTarget;
     let reduceC = Math.min(C_rest, need/4);
     C_rest -= reduceC;
     need -= reduceC*4;
-    // se ainda sobrar, reduzir gordura mantendo >=0.6 g/kg
     if(need > 0){
       const maxReduceF = Math.max(0, F_rest - 0.6*weight);
       const reduceF = Math.min(maxReduceF, need/9);
       F_rest -= reduceF;
       need -= reduceF*9;
     }
-    // se ainda sobrar, reduzir proteína mantendo >=1.6 g/kg (caso extremo)
     if(need > 0){
       const maxReduceP = Math.max(0, P - 1.6*weight);
       const reduceP = Math.min(maxReduceP, need/4);
@@ -606,26 +654,23 @@ function calculate(){
   const fiberTrain = fiberTarget(kcalTarget, fiberMode);
   const fiberRest  = fiberTarget(kcalRestTarget, fiberMode);
 
-  // ---- Distribuição por refeição (treino) ----
+  // REFEIÇÕES (treino)
   const mealRows = $('#mealRowsTrain'); mealRows.innerHTML='';
   const n = meals;
-  // Proteína e gordura divididas igualmente
   const Pm = P / n;
   const Gm = F_train / n;
 
-  // Carboidratos — equilibrado ou avançado
   let carbsPerMeal = Array(n).fill(0);
   if(carbDistrib === 'equilibrado'){
     carbsPerMeal = carbsPerMeal.map(()=> C_train / n);
   }else{
-    // Avançado: prioriza pré (30%) e pós (40%); restante divide nas outras refeições
     const preShare = 0.30, postShare = 0.40;
-    const baseShare = 1 - (preShare + postShare); // 30% restantes
+    const baseShare = 1 - (preShare + postShare);
     const others = Math.max(n - 2, 1);
     const eachOther = baseShare / others;
     for(let i=0;i<n;i++){
-      if(n>=3 && i===1) carbsPerMeal[i] = C_train * preShare;    // Refeição 2 = pré
-      else if(n>=3 && i===2) carbsPerMeal[i] = C_train * postShare; // Refeição 3 = pós
+      if(n>=3 && i===1) carbsPerMeal[i] = C_train * preShare;
+      else if(n>=3 && i===2) carbsPerMeal[i] = C_train * postShare;
       else carbsPerMeal[i] = C_train * (n>=3 ? eachOther : 0.5);
     }
   }
@@ -646,7 +691,7 @@ function calculate(){
     mealRows.appendChild(tr);
   }
 
-  // ---- Render totais ----
+  // TOTAIS TABELA
   $('#bmrOut').textContent  = isFinite(bmr)? round(bmr) : '—';
   $('#tdeeOut').textContent = isFinite(tdee)? round(tdee) : '—';
   $('#kcalTarget').textContent = isFinite(kcalTarget)? round(kcalTarget) : '—';
@@ -669,8 +714,8 @@ function calculate(){
     tb.appendChild(tr);
   }
 
-  // Atualiza gráfico com macros do dia de treino
-  drawMacroChart(P, C_train, F_train);
+  // GRÁFICO: treino x descanso
+  drawMacroChart(P, C_train, F_train, C_rest, F_rest);
 
   const alerts = [];
   if(F < 0.6*weight) alerts.push('Gordura ficou abaixo de 0,6 g/kg (ajuste feito automaticamente).');
@@ -678,41 +723,6 @@ function calculate(){
   document.getElementById('alerts').innerHTML = alerts.length
     ? `<div class="warn">${alerts.map(a=>`• ${a}`).join('<br/>')}</div>`
     : `<div class="ok">Cálculo atualizado em tempo real.</div>`;
-
-  window.__lastCalc__ = {
-    inputs:{sex,age,height,weight,bf,bmrFormula,activity,neat,goal,rateKg,trainDays,carbAdj,carbDistrib,meals,fiberMode,p_kg,f_kg},
-    outputs:{
-      bmr, tdee, kcalTarget: round(kcalTarget),
-      treino:{P:round1(P), C:round(C_train), F:round1(F_train), kcal:round(kcalTarget), fiber:fiberTrain},
-      descanso:{P:round1(P), C:round(C_rest),  F:round1(F_rest),  kcal:round(kcalRestTarget), fiber:fiberRest},
-      meals:meals
-    }
-  };
-}
-
-// Salvar / carregar perfil
-function saveProfile(){
-  const keys = ['sex','age','height','weight','bf','bmrFormula','activity','neat','goal','rate','trainDays','trainCarbAdj','carbDistrib','meals','fiberMode','p_kg','f_kg'];
-  const obj = {};
-  for(const k of keys){
-    const el = document.getElementById(k);
-    obj[k] = el ? el.value : null;
-  }
-  localStorage.setItem('akt_macros_profile', JSON.stringify(obj));
-  alert('Perfil salvo neste navegador.');
-}
-function loadProfile(){
-  const raw = localStorage.getItem('akt_macros_profile');
-  if(!raw){ alert('Nenhum perfil salvo.'); return; }
-  const obj = JSON.parse(raw);
-  for(const k in obj){
-    const el = document.getElementById(k);
-    if(el && obj[k]!=null){ el.value = obj[k]; }
-  }
-  document.getElementById('neatVal').textContent = (document.getElementById('neat').value||0)+'%';
-  document.getElementById('rateVal').textContent = (document.getElementById('rate').value||0)+' kg/sem';
-  document.getElementById('carbAdjVal').textContent = '+'+(document.getElementById('trainCarbAdj').value||0)+'% C (treino)';
-  calculate();
 }
 
 // Reatividade
@@ -742,7 +752,7 @@ function attachRealtime(){
     }
     debouncedCalc();
   });
-  // Toggle buttons for carb distribution
+
   const eq = document.getElementById('distEq');
   const av = document.getElementById('distAv');
   const hidden = document.getElementById('carbDistrib');
@@ -754,14 +764,10 @@ function attachRealtime(){
   }
   eq.addEventListener('click', ()=>setMode('equilibrado'));
   av.addEventListener('click', ()=>setMode('avancado'));
-
-  document.getElementById('saveBtn').addEventListener('click', saveProfile);
-  document.getElementById('loadBtn').addEventListener('click', loadProfile);
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
   initMacroChart();
-
   document.getElementById('neatVal').textContent=(document.getElementById('neat').value||0)+'%';
   const g = document.getElementById('goal').value;
   const kg = defaultRateKg(g);
