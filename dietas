@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>AKT Labs — Montador de Dietas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg-elevated: #0c1016;
+      --bg-elevated-soft: #121824;
+      --border-subtle: #1f2933;
+      --accent: #f97316;
+      --accent-soft: #fb923c33;
+      --text: #e5ecf5;
+      --text-muted: #9ca3b4;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --radius: 14px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+      --base-font-size: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: var(--text);
+      font-size: var(--base-font-size);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(
+        to bottom,
+        rgba(2, 6, 23, 0.96),
+        rgba(2, 6, 23, 0.9),
+        transparent
+      );
+      border-bottom: 1px solid rgba(15, 23, 42, 0.8);
+    }
+
+    .top-bar {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 14px 16px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-pill {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #fed7aa 0, #f97316 40%, #7c2d12 80%);
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: #020617;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .brand-text span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #020617;
+      color: var(--text-muted);
+      transition: background 0.18s ease, border-color 0.18s ease,
+        color 0.18s ease, transform 0.12s ease;
+    }
+
+    .btn span.icon {
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      color: #020617;
+      border-color: rgba(249, 115, 22, 0.8);
+      box-shadow: 0 10px 28px rgba(249, 115, 22, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(249, 115, 22, 0.5);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: rgba(30, 64, 175, 0.8);
+      color: var(--text);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .btn-outline {
+      border-color: rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .toggle-chip-group {
+      display: inline-flex;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+    }
+
+    .toggle-chip {
+      border: none;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: transparent;
+      transition: background 0.16s ease, color 0.16s ease;
+    }
+
+    .toggle-chip.active {
+      background: var(--accent);
+      color: #020617;
+    }
+
+    .display-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .display-controls label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .display-controls select {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .font-size-controls {
+      display: inline-flex;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+    }
+
+    .font-size-controls button {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .font-size-controls button:hover {
+      background: rgba(15, 23, 42, 1);
+      color: var(--accent);
+    }
+
+    main.app-main {
+      flex: 1;
+    }
+
+    .app-container {
+      max-width: 1120px;
+      margin: 10px auto 40px;
+      padding: 0 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel {
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 14px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      opacity: 0.04;
+      background:
+        radial-gradient(circle at 0 0, #f97316 0, transparent 55%),
+        radial-gradient(circle at 100% 0, #22c55e 0, transparent 55%);
+      pointer-events: none;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-title span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.7);
+    }
+
+    .panel-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .field-label span.badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      font-size: 9px;
+      margin-left: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="time"],
+    textarea,
+    select {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 10px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      padding: 7px 9px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background 0.15s ease;
+      width: 100%;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+      max-height: 180px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.6);
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .meals-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .meals-header .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .meals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .meal-card {
+      border-radius: 12px;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.95),
+        rgba(15, 23, 42, 0.98)
+      );
+      padding: 10px 10px 8px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+      position: relative;
+    }
+
+    .meal-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .meal-main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      flex: 1;
+    }
+
+    .meal-name-field {
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .meal-time-field {
+      width: 110px;
+      max-width: 140px;
+    }
+
+    .meal-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meal-index-chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 1);
+      border: 1px solid rgba(55, 65, 81, 1);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .meal-move-btns {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      background: rgba(15, 23, 42, 0.95);
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 0;
+    }
+
+    .icon-btn.danger {
+      border-color: rgba(248, 113, 113, 0.8);
+      color: var(--danger);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .foods-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 6px;
+    }
+
+    .foods-table thead {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .foods-table th,
+    .foods-table td {
+      padding: 4px 4px;
+      text-align: left;
+    }
+
+    .foods-table th {
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .foods-table td {
+      border-bottom: 1px solid rgba(15, 23, 42, 0.8);
+    }
+
+    .foods-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .food-input {
+      width: 100%;
+    }
+
+    .food-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .pill-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      padding: 3px 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 1);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pill-btn.substitution {
+      border-color: rgba(249, 115, 22, 0.7);
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .pill-btn.substitution span.icon {
+      font-size: 12px;
+    }
+
+    .meal-notes {
+      margin-top: 4px;
+    }
+
+    .meal-notes textarea {
+      font-size: 12px;
+    }
+
+    .notes-footer {
+      margin-top: 6px;
+    }
+
+    .notes-footer textarea {
+      font-size: 13px;
+    }
+
+    .helper-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .helper-row small {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(148, 163, 184, 0.6),
+        transparent
+      );
+      margin: 4px 0 0;
+      opacity: 0.7;
+    }
+
+    /* Modal de substituições */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(620px, 100% - 24px);
+      max-height: min(520px, 100% - 40px);
+      background: #020617;
+      border-radius: 20px;
+      border: 1px solid rgba(30, 64, 175, 0.9);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+      padding: 14px 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .modal-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .modal-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .modal-close {
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      background: rgba(15, 23, 42, 0.95);
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .modal-close:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .modal-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chips-row {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      padding: 3px 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 1);
+      color: var(--text-muted);
+    }
+
+    .chip.active {
+      border-color: var(--accent);
+      background: rgba(249, 115, 22, 0.12);
+      color: var(--accent);
+    }
+
+    .groups-list {
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 1);
+      background: radial-gradient(circle at top left, #111827 0, #020617 60%);
+      padding: 8px;
+      max-height: 320px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .group-card {
+      border-radius: 10px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      padding: 6px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .group-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .group-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      background: rgba(15, 23, 42, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+
+    .equivalents-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .equiv-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      padding: 3px 7px;
+      font-size: 11px;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 1);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .equiv-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 4px;
+    }
+
+    .modal-footer small {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        padding-bottom: 8px;
+      }
+      .header-actions {
+        justify-content: flex-start;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .meal-main {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .meal-time-field {
+        width: 100%;
+        max-width: none;
+      }
+      .foods-table th:nth-child(2),
+      .foods-table td:nth-child(2),
+      .foods-table th:nth-child(3),
+      .foods-table td:nth-child(3) {
+        width: 75px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        font-size: 11px;
+      }
+
+      header.app-header,
+      .header-actions,
+      .display-controls,
+      .btn,
+      .icon-btn,
+      .pill-btn,
+      .modal-backdrop {
+        display: none !important;
+      }
+
+      .app-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .panel {
+        box-shadow: none;
+        border-radius: 0;
+        background: #ffffff;
+        border: none;
+        padding: 0;
+      }
+
+      .panel::before {
+        display: none;
+      }
+
+      .panel-header {
+        margin-bottom: 4px;
+      }
+
+      .panel-title span.dot {
+        display: none;
+      }
+
+      input,
+      textarea,
+      select {
+        border: none;
+        padding: 0;
+        background: transparent;
+      }
+
+      .meal-card {
+        box-shadow: none;
+        border-radius: 0;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+      }
+
+      .foods-table th,
+      .foods-table td {
+        border-color: #e5e7eb;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <header class="app-header">
+    <div class="top-bar">
+      <div class="brand-block">
+        <div class="brand-pill">AKT</div>
+        <div class="brand-text">
+          <h1>Montador de Dietas</h1>
+          <span>Planner local com substituições inteligentes</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="toggle-chip-group" id="dayTypeToggle">
+          <button class="toggle-chip active" data-day-type="treino">
+            Dia de Treino
+          </button>
+          <button class="toggle-chip" data-day-type="off">
+            Dia Off
+          </button>
+        </div>
+
+        <button class="btn btn-outline" id="newPlanBtn">
+          <span class="icon">🧹</span> Novo plano
+        </button>
+        <button class="btn btn-ghost" id="saveBtn">
+          <span class="icon">💾</span> Salvar localmente
+        </button>
+        <button class="btn btn-primary" id="pdfBtn">
+          <span class="icon">📄</span> Gerar PDF
+        </button>
+
+        <div class="display-controls">
+          <label for="fontFamilySelect">Fonte</label>
+          <select id="fontFamilySelect">
+            <option value="system">Padrão</option>
+            <option value="serif">Serifada</option>
+            <option value="mono">Monoespaçada</option>
+          </select>
+
+          <div class="font-size-controls">
+            <button type="button" id="fontSizeDown">A-</button>
+            <button type="button" id="fontSizeUp">A+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="app-container">
+      <section class="panel" id="clientPanel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="dot"></span> Dados do cliente
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label" for="clientName">
+                Nome do cliente
+              </label>
+              <input id="clientName" type="text" placeholder="Ex: João Silva" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="clientGoal">
+                Objetivo
+              </label>
+              <input id="clientGoal" type="text" placeholder="Ex: Ganho de massa / Cutting" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label" for="clientWeight">
+                Peso atual (kg)
+              </label>
+              <input id="clientWeight" type="number" step="0.1" min="0" placeholder="Ex: 82.5" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="clientCalories">
+                Calorias alvo (kcal/dia)
+              </label>
+              <input id="clientCalories" type="number" step="10" min="0" placeholder="Ex: 2600" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="mealsPanel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="dot"></span> Refeições do plano
+          </div>
+          <button class="btn btn-outline" id="addMealBtn">
+            <span class="icon">➕</span> Adicionar refeição
+          </button>
+        </div>
+        <div class="panel-body">
+          <div class="meals-header">
+            <div class="hint">
+              Monte as refeições, adicione alimentos, escolha a categoria (carbo, proteína, fruta, gordura)
+              e use <strong>Substituições</strong> para puxar equivalentes pré-definidos.
+            </div>
+          </div>
+          <div class="meals-list" id="mealsList"></div>
+
+          <div class="notes-footer">
+            <div class="field-group">
+              <label class="field-label" for="generalNotes">
+                Observações gerais do plano
+              </label>
+              <textarea id="generalNotes" placeholder="Orientações gerais, regras, estratégia do protocolo, ajustes finos..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Substituições -->
+<div class="modal-backdrop" id="subModalBackdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Substituições</div>
+        <div class="modal-subtitle" id="subModalSubtitle">
+          Selecione um equivalente para substituir o alimento selecionado.
+        </div>
+      </div>
+      <button class="modal-close" type="button" id="subModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-filters">
+        <div class="chips-row" id="subCategoryChips">
+          <button class="chip" data-cat="carbs">Carboidratos</button>
+          <button class="chip" data-cat="proteins">Proteínas</button>
+          <button class="chip" data-cat="fruits">Frutas</button>
+          <button class="chip" data-cat="fats">Gorduras</button>
+        </div>
+      </div>
+      <div class="groups-list" id="subGroupsList">
+        <!-- grupos renderizados via JS -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <small>Clique em uma opção para aplicá-la ao alimento escolhido.</small>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==========================
+  // BANCO DE SUBSTITUIÇÕES AKT
+  // ==========================
+  const substitutionBank = {
+    carbs: [
+      {
+        id: "carb_01",
+        label: "Suco de fruta envasado",
+        equivalents: [
+          "200mL suco de fruta envasado (24–28g carboidratos para cada 200mL)"
+        ]
+      },
+      {
+        id: "carb_02",
+        label: "Pão / tapioca / rap10 — porção pequena",
+        equivalents: [
+          "25g pão",
+          "30g tapioca (30–32g CHO para 60g)",
+          "30g rap10/wrap"
+        ]
+      },
+      {
+        id: "carb_03",
+        label: "Pão / tapioca / rap10 / raízes — porção 1",
+        equivalents: [
+          "50g pão",
+          "60g tapioca (30–32g CHO para 60g)",
+          "60g rap10/wrap",
+          "110g cuscuz cozido",
+          "90g mandioca cozida"
+        ]
+      },
+      {
+        id: "carb_04",
+        label: "Pão / tapioca / rap10 / raízes — porção 2",
+        equivalents: [
+          "75g pão",
+          "90g tapioca (30–32g CHO para 60g)",
+          "90g rap10/wrap",
+          "170g cuscuz cozido",
+          "140g mandioca cozida"
+        ]
+      },
+      {
+        id: "carb_05",
+        label: "Pão / tapioca / rap10 / raízes — porção 3",
+        equivalents: [
+          "100g pão",
+          "120g tapioca (30–32g CHO para 60g)",
+          "120g rap10/wrap",
+          "220g cuscuz cozido",
+          "280g mandioca cozida"
+        ]
+      },
+      {
+        id: "carb_06",
+        label: "Pão / tapioca / rap10 / cuscuz — porção 4",
+        equivalents: [
+          "125g pão",
+          "150g tapioca (30–32g CHO para 60g)",
+          "150g rap10/wrap",
+          "275g cuscuz cozido"
+        ]
+      },
+      {
+        id: "carb_07",
+        label: "Pão / tapioca / rap10 — porção 5",
+        equivalents: [
+          "150g pão",
+          "180g tapioca (30–32g CHO para 60g)",
+          "180g rap10/wrap"
+        ]
+      },
+      {
+        id: "carb_08",
+        label: "Pão / rap10 — porção grande",
+        equivalents: [
+          "200g pão",
+          "240g rap10/wrap"
+        ]
+      },
+      {
+        id: "carb_09",
+        label: "Aveia / farinhas / granola — porção 1",
+        equivalents: [
+          "20g aveia",
+          "15g farinha de arroz",
+          "20g granola",
+          "15g mucilon",
+          "20g neston"
+        ]
+      },
+      {
+        id: "carb_10",
+        label: "Aveia / farinhas / granola — porção 2",
+        equivalents: [
+          "40g aveia",
+          "30g farinha de arroz",
+          "40g granola",
+          "30g mucilon",
+          "40g neston"
+        ]
+      },
+      {
+        id: "carb_11",
+        label: "Farinha de arroz / cream of rice — porção 1",
+        equivalents: [
+          "50g farinha de arroz",
+          "60g cream of rice"
+        ]
+      },
+      {
+        id: "carb_12",
+        label: "Farinha de arroz / cream of rice — porção 2",
+        equivalents: [
+          "80g farinha de arroz",
+          "90g cream of rice"
+        ]
+      },
+      {
+        id: "carb_13",
+        label: "Farinha de arroz / cream of rice — porção 3",
+        equivalents: [
+          "100g farinha de arroz",
+          "120g cream of rice"
+        ]
+      },
+      {
+        id: "carb_14",
+        label: "Farinha de arroz / cream of rice — porção 4",
+        equivalents: [
+          "120g farinha de arroz",
+          "140g cream of rice"
+        ]
+      },
+      {
+        id: "carb_15",
+        label: "Farinha de arroz / cream of rice — porção 5",
+        equivalents: [
+          "150g farinha de arroz",
+          "180g cream of rice"
+        ]
+      },
+      {
+        id: "carb_16",
+        label: "Aveia / farinhas / granola — porção 3",
+        equivalents: [
+          "60g aveia",
+          "45g farinha de arroz",
+          "60g granola",
+          "45g mucilon",
+          "60g neston"
+        ]
+      },
+      {
+        id: "carb_17",
+        label: "Aveia / farinhas / granola — porção 4",
+        equivalents: [
+          "80g aveia",
+          "60g farinha de arroz",
+          "80g granola",
+          "60g mucilon",
+          "80g neston"
+        ]
+      },
+      {
+        id: "carb_18",
+        label: "Aveia / farinhas / granola — porção 5",
+        equivalents: [
+          "100g aveia",
+          "75g farinha de arroz",
+          "100g granola",
+          "75g mucilon",
+          "100g neston"
+        ]
+      },
+      {
+        id: "carb_19",
+        label: "Aveia / farinhas / granola — porção 6",
+        equivalents: [
+          "120g aveia",
+          "90g farinha de arroz",
+          "120g granola",
+          "90g mucilon",
+          "120g neston"
+        ]
+      },
+      {
+        id: "carb_20",
+        label: "Aveia / farinhas / granola — porção 7",
+        equivalents: [
+          "160g aveia",
+          "120g farinha de arroz",
+          "160g granola",
+          "120g mucilon",
+          "160g neston"
+        ]
+      },
+      {
+        id: "carb_21",
+        label: "Arroz / macarrão / raízes / cuscuz — porção 1",
+        equivalents: [
+          "50g arroz cozido",
+          "45g macarrão cozido",
+          "115g batata inglesa cozida",
+          "115g abóbora cabotian cozida",
+          "45g mandioca cozida",
+          "75g batata doce cozida",
+          "55g cuscuz cozido"
+        ]
+      },
+      {
+        id: "carb_22",
+        label: "Abóbora / batata inglesa / batata doce — porção 1",
+        equivalents: [
+          "100g abóbora cabotian cozida",
+          "100g batata inglesa cozida",
+          "60g batata doce cozida"
+        ]
+      },
+      {
+        id: "carb_23",
+        label: "Abóbora / batata inglesa / batata doce — porção 2",
+        equivalents: [
+          "150g abóbora cabotian cozida",
+          "150g batata inglesa cozida",
+          "100g batata doce cozida"
+        ]
+      },
+      {
+        id: "carb_24",
+        label: "Abóbora / batata inglesa / batata doce / mandioca — porção 3",
+        equivalents: [
+          "200g abóbora cabotian cozida",
+          "200g batata inglesa cozida",
+          "120g batata doce cozida",
+          "80g mandioca cozida"
+        ]
+      },
+      {
+        id: "carb_25",
+        label: "Abóbora / batata inglesa / batata doce / mandioca — porção 4",
+        equivalents: [
+          "250g abóbora cabotian cozida",
+          "250g batata inglesa cozida",
+          "150g batata doce cozida",
+          "90g mandioca cozida"
+        ]
+      },
+      {
+        id: "carb_26",
+        label: "Batata inglesa / batata doce / mandioca — porção 5",
+        equivalents: [
+          "300g batata inglesa cozida",
+          "180g batata doce cozida",
+          "110g mandioca cozida"
+        ]
+      },
+      {
+        id: "carb_27",
+        label: "Arroz / feijão / macarrão / raízes / cuscuz / abóbora — porção 2",
+        equivalents: [
+          "100g arroz cozido",
+          "70g arroz cozido + 70g feijão cozido",
+          "85g macarrão cozido",
+          "230g batata inglesa cozida",
+          "90g mandioca cozida",
+          "150g batata doce cozida",
+          "110g cuscuz cozido",
+          "230g abóbora cabotian cozida"
+        ]
+      },
+      {
+        id: "carb_28",
+        label: "Arroz / feijão / mandioca / macarrão / cuscuz / batatas — porção 3",
+        equivalents: [
+          "150g arroz cozido",
+          "100g arroz cozido + 100g feijão cozido",
+          "140g mandioca cozida",
+          "130g macarrão cozido",
+          "170g cuscuz cozido",
+          "230g batata doce cozida",
+          "360g batata inglesa cozida"
+        ]
+      },
+      {
+        id: "carb_29",
+        label: "Arroz / feijão / macarrão / batatas / mandioca / cuscuz — porção 4",
+        equivalents: [
+          "200g arroz cozido",
+          "150g arroz cozido + 100g feijão cozido",
+          "170g macarrão cozido",
+          "460g batata inglesa cozida",
+          "180g mandioca cozida",
+          "300g batata doce cozida",
+          "220g cuscuz cozido"
+        ]
+      },
+      {
+        id: "carb_30",
+        label: "Arroz / feijão / macarrão / batatas / mandioca / cuscuz — porção 5",
+        equivalents: [
+          "250g arroz cozido",
+          "200g arroz cozido + 100g feijão cozido",
+          "215g macarrão cozido",
+          "575g batata inglesa cozida",
+          "225g mandioca cozida",
+          "375g batata doce cozida",
+          "275g cuscuz cozido"
+        ]
+      },
+      {
+        id: "carb_31",
+        label: "Arroz / feijão / macarrão / batatas / mandioca — porção 6",
+        equivalents: [
+          "300g arroz cozido",
+          "250g arroz cozido + 100g feijão cozido",
+          "255g macarrão cozido",
+          "690g batata inglesa cozida",
+          "270g mandioca cozida",
+          "450g batata doce cozida"
+        ]
+      },
+      {
+        id: "carb_32",
+        label: "Arroz / macarrão / mandioca / cuscuz — porção 7",
+        equivalents: [
+          "400g arroz cozido",
+          "350g arroz cozido + 100g feijão cozido",
+          "340g macarrão cozido",
+          "360g mandioca cozida",
+          "440g cuscuz cozido"
+        ]
+      },
+      {
+        id: "carb_33",
+        label: "Arroz / macarrão — porção 8",
+        equivalents: [
+          "500g arroz cozido",
+          "425g macarrão cozido"
+        ]
+      },
+      {
+        id: "carb_34",
+        label: "Arroz / macarrão — porção 9",
+        equivalents: [
+          "600g arroz cozido",
+          "510g macarrão cozido"
+        ]
+      },
+      {
+        id: "carb_35",
+        label: "Arroz / macarrão — porção 10",
+        equivalents: [
+          "700g arroz cozido",
+          "595g macarrão cozido"
+        ]
+      }
+    ],
+
+    proteins: [
+      {
+        id: "prot_01",
+        label: "Lácteos — porção 1",
+        equivalents: [
+          "200mL leite integral",
+          "25g leite em pó integral",
+          "200g iogurte natural sem açúcar"
+        ]
+      },
+      {
+        id: "prot_02",
+        label: "Lácteos — porção 2",
+        equivalents: [
+          "300mL leite integral",
+          "38g leite em pó integral",
+          "300g iogurte natural sem açúcar"
+        ]
+      },
+      {
+        id: "prot_03",
+        label: "Lácteos — porção 3",
+        equivalents: [
+          "400mL leite integral",
+          "50g leite em pó integral",
+          "400g iogurte natural sem açúcar"
+        ]
+      },
+      {
+        id: "prot_04",
+        label: "Whey — porção 1",
+        equivalents: [
+          "15g whey (tabela 24g PRT para 30g dose)",
+          "20g whey (tabela 24g PRT para 40g dose)"
+        ]
+      },
+      {
+        id: "prot_05",
+        label: "Whey — porção 2",
+        equivalents: [
+          "30g whey (tabela 24g PRT para 30g dose)",
+          "40g whey (tabela 24g PRT para 40g dose)"
+        ]
+      },
+      {
+        id: "prot_06",
+        label: "Whey — porção 3",
+        equivalents: [
+          "45g whey (tabela 24g PRT para 30g dose)",
+          "60g whey (tabela 24g PRT para 40g dose)"
+        ]
+      },
+      {
+        id: "prot_07",
+        label: "Carnes / peixes / camarão — porção 1",
+        equivalents: [
+          "50g filé de peito de frango grelhado",
+          "50g carne vermelha magra grelhada",
+          "50g filé mignon suíno grelhado",
+          "65g atum (peso cru)",
+          "90g filé de tilápia (peso cru)",
+          "100g filé de merluza (peso cru)",
+          "150g camarão (peso cru)"
+        ]
+      },
+      {
+        id: "prot_08",
+        label: "Carnes — porção 2",
+        equivalents: [
+          "80g filé de peito de frango grelhado",
+          "80g carne vermelha magra grelhada",
+          "80g filé mignon suíno grelhado"
+        ]
+      },
+      {
+        id: "prot_09",
+        label: "Carnes / peixes / ovos / camarão — porção 3",
+        equivalents: [
+          "100g filé de peito de frango grelhado",
+          "100g carne vermelha magra grelhada",
+          "100g filé mignon suíno grelhado",
+          "130g atum (peso cru)",
+          "180g filé de tilápia (peso cru)",
+          "200g filé de merluza (peso cru)",
+          "1 ovo inteiro com 6 claras",
+          "300g camarão (peso cru)"
+        ]
+      },
+      {
+        id: "prot_10",
+        label: "Equivalentes a 100g frango grelhado — peixes (peso cru)",
+        equivalents: [
+          "160g tilápia",
+          "160g pescada",
+          "160g linguado",
+          "170g badejo",
+          "150g robalo"
+        ]
+      },
+      {
+        id: "prot_11",
+        label: "Equivalentes a 150g frango grelhado — peixes (peso cru)",
+        equivalents: [
+          "240g tilápia",
+          "250g pescada",
+          "245g linguado",
+          "250g badejo",
+          "235g robalo"
+        ]
+      },
+      {
+        id: "prot_12",
+        label: "Carnes / peixes / ovos / camarão — porção 4",
+        equivalents: [
+          "150g filé de peito de frango grelhado",
+          "150g carne vermelha magra grelhada",
+          "150g filé mignon suíno grelhado",
+          "190g atum (peso cru)",
+          "270g filé de tilápia (peso cru)",
+          "300g filé de merluza (peso cru)",
+          "1 ovo inteiro com 11 claras",
+          "480g camarão (peso cru)"
+        ]
+      },
+      {
+        id: "prot_13",
+        label: "Carnes / peixes / camarão — porção 5",
+        equivalents: [
+          "200g filé de peito de frango grelhado",
+          "200g carne vermelha magra grelhada",
+          "200g filé mignon suíno grelhado",
+          "260g atum (peso cru)",
+          "360g filé de tilápia (peso cru)",
+          "400g filé de merluza (peso cru)",
+          "600g camarão (peso cru)"
+        ]
+      },
+      {
+        id: "prot_14",
+        label: "Carnes / peixes / camarão — porção 6",
+        equivalents: [
+          "250g filé de peito de frango grelhado",
+          "250g carne vermelha magra grelhada",
+          "250g filé mignon suíno grelhado",
+          "325g atum (peso cru)",
+          "450g filé de tilápia (peso cru)",
+          "500g filé de merluza (peso cru)",
+          "750g camarão (peso cru)"
+        ]
+      }
+    ],
+
+    fruits: [
+      {
+        id: "fruit_01",
+        label: "Frutas — porção 1",
+        equivalents: [
+          "115g morango",
+          "70g mamão",
+          "65g abacaxi",
+          "60g maçã",
+          "30g banana prata",
+          "70g laranja",
+          "60g uva",
+          "55g blueberry/mirtilo",
+          "80g blackberry/amora",
+          "45g manga",
+          "100g melancia",
+          "60g framboesa",
+          "110g melão",
+          "70g kiwi",
+          "90g pêssego",
+          "80g figo",
+          "65g maracujá",
+          "60g ameixa"
+        ]
+      },
+      {
+        id: "fruit_02",
+        label: "Frutas — porção 2",
+        equivalents: [
+          "230g morango",
+          "140g mamão",
+          "130g abacaxi",
+          "120g maçã",
+          "60g banana prata",
+          "140g laranja",
+          "120g uva",
+          "110g blueberry/mirtilo",
+          "160g blackberry/amora",
+          "85g manga",
+          "200g melancia",
+          "120g framboesa",
+          "220g melão",
+          "140g kiwi",
+          "180g pêssego",
+          "160g figo",
+          "130g maracujá",
+          "120g ameixa"
+        ]
+      },
+      {
+        id: "fruit_03",
+        label: "Frutas — porção 3",
+        equivalents: [
+          "360g morango",
+          "210g mamão",
+          "190g abacaxi",
+          "180g maçã",
+          "90g banana prata",
+          "210g laranja",
+          "180g uva",
+          "165g blueberry/mirtilo",
+          "240g blackberry/amora",
+          "130g manga",
+          "300g melancia",
+          "180g framboesa",
+          "300g melão",
+          "210g kiwi",
+          "270g pêssego",
+          "240g figo",
+          "195g maracujá",
+          "180g ameixa"
+        ]
+      },
+      {
+        id: "fruit_04",
+        label: "Frutas — porção 4",
+        equivalents: [
+          "460g morango",
+          "280g mamão",
+          "260g abacaxi",
+          "240g maçã",
+          "120g banana prata",
+          "280g laranja",
+          "240g uva",
+          "220g blueberry/mirtilo",
+          "320g blackberry/amora",
+          "170g manga",
+          "400g melancia",
+          "240g framboesa",
+          "440g melão",
+          "280g kiwi",
+          "360g pêssego",
+          "320g figo",
+          "260g maracujá",
+          "240g ameixa"
+        ]
+      }
+    ],
+
+    fats: [
+      {
+        id: "fat_01",
+        label: "Queijos / requeijão / cottage — porção 1",
+        equivalents: [
+          "20g queijo mozarela",
+          "20g queijo parmesão",
+          "40g queijo ricota",
+          "20g requeijão cremoso",
+          "20g queijo minas frescal",
+          "30g creme de ricota",
+          "60g queijo cottage"
+        ]
+      },
+      {
+        id: "fat_02",
+        label: "Queijos / requeijão / cottage — porção 2",
+        equivalents: [
+          "30g queijo mozarela",
+          "25g queijo parmesão",
+          "60g queijo ricota",
+          "40g requeijão cremoso",
+          "35g queijo minas frescal",
+          "60g creme de ricota",
+          "90g queijo cottage"
+        ]
+      },
+      {
+        id: "fat_03",
+        label: "Queijos / requeijão / cottage — porção 3",
+        equivalents: [
+          "40g queijo mozarela",
+          "40g queijo parmesão",
+          "80g queijo ricota",
+          "40g requeijão cremoso",
+          "40g queijo minas frescal",
+          "60g creme de ricota",
+          "120g queijo cottage"
+        ]
+      },
+      {
+        id: "fat_04",
+        label: "Queijos — porção reduzida",
+        equivalents: [
+          "60g queijo cottage",
+          "15g queijo parmesão",
+          "40g queijo ricota",
+          "25g requeijão cremoso"
+        ]
+      },
+      {
+        id: "fat_05",
+        label: "Ovo / queijos — porção 4",
+        equivalents: [
+          "1 ovo inteiro",
+          "30g queijo mozarela",
+          "70g queijo ricota",
+          "40g requeijão cremoso",
+          "35g queijo minas frescal",
+          "60g creme de ricota"
+        ]
+      },
+      {
+        id: "fat_06",
+        label: "Queijos / requeijão — porção 5",
+        equivalents: [
+          "60g queijo mozarela",
+          "60g queijo parmesão",
+          "80g requeijão cremoso"
+        ]
+      }
+    ]
+  };
+
+  // ==========================
+  // ESTADO DO APP
+  // ==========================
+  const STORAGE_KEY = "akt_diet_planner_v1";
+
+  let state = {
+    client: {
+      name: "",
+      goal: "",
+      weight: "",
+      calories: "",
+      dayType: "treino"
+    },
+    settings: {
+      fontFamily: "system",
+      fontSize: 14
+    },
+    notes: {
+      general: ""
+    },
+    meals: []
+  };
+
+  let currentFoodForSub = null; // { mealId, foodId, category }
+
+  function createMeal() {
+    return {
+      id: "meal_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+      name: "",
+      time: "",
+      notes: "",
+      foods: []
+    };
+  }
+
+  function createFood() {
+    return {
+      id: "food_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+      name: "",
+      quantity: "",
+      unit: "g",
+      category: "carbs",
+      notes: ""
+    };
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error("Erro ao salvar no localStorage", e);
+    }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        state = parsed;
+      }
+    } catch (e) {
+      console.error("Erro ao carregar do localStorage", e);
+    }
+  }
+
+  // ==========================
+  // RENDERIZAÇÃO
+  // ==========================
+  function render() {
+    // dados cliente
+    document.getElementById("clientName").value = state.client.name || "";
+    document.getElementById("clientGoal").value = state.client.goal || "";
+    document.getElementById("clientWeight").value = state.client.weight || "";
+    document.getElementById("clientCalories").value = state.client.calories || "";
+    document.getElementById("generalNotes").value = state.notes.general || "";
+
+    // day type
+    const toggleButtons = document.querySelectorAll(
+      "#dayTypeToggle .toggle-chip"
+    );
+    toggleButtons.forEach((btn) => {
+      const type = btn.getAttribute("data-day-type");
+      btn.classList.toggle("active", type === state.client.dayType);
+    });
+
+    // fonte
+    const fontSelect = document.getElementById("fontFamilySelect");
+    fontSelect.value = state.settings.fontFamily || "system";
+    applyFontFamily();
+
+    const fontSize = state.settings.fontSize || 14;
+    document.documentElement.style.setProperty(
+      "--base-font-size",
+      fontSize + "px"
+    );
+
+    // refeições
+    const mealsList = document.getElementById("mealsList");
+    mealsList.innerHTML = "";
+
+    state.meals.forEach((meal, idx) => {
+      const mealCard = document.createElement("div");
+      mealCard.className = "meal-card";
+      mealCard.dataset.mealId = meal.id;
+
+      const header = document.createElement("div");
+      header.className = "meal-header";
+
+      const mealMain = document.createElement("div");
+      mealMain.className = "meal-main";
+
+      const nameField = document.createElement("div");
+      nameField.className = "meal-name-field";
+      nameField.innerHTML = `
+        <div class="field-group">
+          <label class="field-label">Nome da refeição</label>
+          <input type="text" class="meal-name-input" placeholder="Ex: Café da manhã, Pré-treino..."
+            value="${meal.name || ""}">
+        </div>
+      `;
+
+      const timeField = document.createElement("div");
+      timeField.className = "meal-time-field";
+      timeField.innerHTML = `
+        <div class="field-group">
+          <label class="field-label">Horário</label>
+          <input type="time" class="meal-time-input" value="${meal.time || ""}">
+        </div>
+      `;
+
+      mealMain.appendChild(nameField);
+      mealMain.appendChild(timeField);
+
+      const meta = document.createElement("div");
+      meta.className = "meal-meta";
+
+      const indexChip = document.createElement("div");
+      indexChip.className = "meal-index-chip";
+      indexChip.textContent = "REFEIÇÃO " + (idx + 1);
+
+      const moveBtns = document.createElement("div");
+      moveBtns.className = "meal-move-btns";
+      moveBtns.innerHTML = `
+        <button class="icon-btn move-up" title="Subir refeição">↑</button>
+        <button class="icon-btn move-down" title="Descer refeição">↓</button>
+        <button class="icon-btn danger delete-meal" title="Remover refeição">✕</button>
+      `;
+
+      meta.appendChild(indexChip);
+      meta.appendChild(moveBtns);
+
+      header.appendChild(mealMain);
+      header.appendChild(meta);
+
+      // tabela de alimentos
+      const foodsTable = document.createElement("table");
+      foodsTable.className = "foods-table";
+      foodsTable.innerHTML = `
+        <thead>
+          <tr>
+            <th>Alimento</th>
+            <th>Qtde</th>
+            <th>Un.</th>
+            <th>Categoria</th>
+            <th>Notas</th>
+            <th style="text-align:right;">Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = foodsTable.querySelector("tbody");
+
+      meal.foods.forEach((food) => {
+        const tr = document.createElement("tr");
+        tr.dataset.foodId = food.id;
+        tr.innerHTML = `
+          <td>
+            <input type="text" class="food-input food-name" placeholder="Ex: Arroz, Frango, Banana..."
+              value="${food.name || ""}">
+          </td>
+          <td style="width:70px;">
+            <input type="number" class="food-input food-qty" min="0" step="1" value="${food.quantity || ""}">
+          </td>
+          <td style="width:70px;">
+            <input type="text" class="food-input food-unit" value="${
+              food.unit || "g"
+            }">
+          </td>
+          <td style="width:100px;">
+            <select class="food-category">
+              <option value="carbs"${
+                food.category === "carbs" ? " selected" : ""
+              }>Carbo</option>
+              <option value="proteins"${
+                food.category === "proteins" ? " selected" : ""
+              }>Proteína</option>
+              <option value="fruits"${
+                food.category === "fruits" ? " selected" : ""
+              }>Fruta</option>
+              <option value="fats"${
+                food.category === "fats" ? " selected" : ""
+              }>Gordura</option>
+            </select>
+          </td>
+          <td style="min-width:160px;">
+            <input type="text" class="food-input food-notes" placeholder="Observação opcional..."
+              value="${food.notes || ""}">
+          </td>
+          <td style="width:150px;">
+            <div class="food-actions">
+              <button type="button" class="pill-btn substitution">
+                <span class="icon">🔁</span> Substituições
+              </button>
+              <button type="button" class="icon-btn delete-food" title="Remover alimento">
+                ✕
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // botão adicionar alimento
+      const addFoodRow = document.createElement("div");
+      addFoodRow.className = "helper-row";
+      addFoodRow.innerHTML = `
+        <button type="button" class="pill-btn add-food-btn">
+          <span class="icon">➕</span> Adicionar alimento
+        </button>
+      `;
+
+      // notas da refeição
+      const notes = document.createElement("div");
+      notes.className = "meal-notes";
+      notes.innerHTML = `
+        <div class="field-group">
+          <label class="field-label">
+            Observações da refeição
+          </label>
+          <textarea class="meal-notes-input" placeholder="Instruções específicas desta refeição, timing, ajustes...">${
+            meal.notes || ""
+          }</textarea>
+        </div>
+        <div class="divider"></div>
+      `;
+
+      mealCard.appendChild(header);
+      mealCard.appendChild(foodsTable);
+      mealCard.appendChild(addFoodRow);
+      mealCard.appendChild(notes);
+
+      mealsList.appendChild(mealCard);
+    });
+
+    if (state.meals.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "helper-row";
+      empty.style.justifyContent = "flex-start";
+      empty.innerHTML =
+        "<small>Nenhuma refeição ainda. Clique em <strong>Adicionar refeição</strong> para começar.</small>";
+      document.getElementById("mealsList").appendChild(empty);
+    }
+  }
+
+  // ==========================
+  // FONTES
+  // ==========================
+  function applyFontFamily() {
+    let family = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    if (state.settings.fontFamily === "serif") {
+      family = "Georgia, 'Times New Roman', serif";
+    } else if (state.settings.fontFamily === "mono") {
+      family = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+    }
+    document.body.style.fontFamily = family;
+  }
+
+  // ==========================
+  // MODAL DE SUBSTITUIÇÕES
+  // ==========================
+  const subModalBackdrop = document.getElementById("subModalBackdrop");
+  const subGroupsList = document.getElementById("subGroupsList");
+  const subCategoryChips = document.getElementById("subCategoryChips");
+
+  function openSubstitutionModal(mealId, foodId, category) {
+    currentFoodForSub = { mealId, foodId, category: category || "carbs" };
+    // atualizar chips
+    const chips = subCategoryChips.querySelectorAll(".chip");
+    chips.forEach((chip) => {
+      const cat = chip.getAttribute("data-cat");
+      chip.classList.toggle("active", cat === currentFoodForSub.category);
+    });
+    // render grupos
+    renderSubstitutionGroups(currentFoodForSub.category);
+    // subtitle
+    const subtitle = document.getElementById("subModalSubtitle");
+    subtitle.textContent =
+      "Categoria atual: " +
+      (categoryLabel(currentFoodForSub.category)) +
+      ". Clique em uma opção para aplicar.";
+    subModalBackdrop.classList.add("open");
+  }
+
+  function closeSubstitutionModal() {
+    subModalBackdrop.classList.remove("open");
+    currentFoodForSub = null;
+  }
+
+  function categoryLabel(cat) {
+    switch (cat) {
+      case "carbs":
+        return "Carboidratos";
+      case "proteins":
+        return "Proteínas";
+      case "fruits":
+        return "Frutas";
+      case "fats":
+        return "Gorduras";
+      default:
+        return "";
+    }
+  }
+
+  function renderSubstitutionGroups(category) {
+    subGroupsList.innerHTML = "";
+    const groups = substitutionBank[category] || [];
+    groups.forEach((group, idx) => {
+      const card = document.createElement("div");
+      card.className = "group-card";
+
+      const header = document.createElement("div");
+      header.className = "group-header";
+      const label = document.createElement("div");
+      label.className = "group-label";
+      label.textContent = group.label;
+      const badge = document.createElement("div");
+      badge.className = "group-badge";
+      badge.textContent = "GRUPO " + (idx + 1);
+      header.appendChild(label);
+      header.appendChild(badge);
+
+      const list = document.createElement("div");
+      list.className = "equivalents-list";
+
+      group.equivalents.forEach((eq) => {
+        const pill = document.createElement("button");
+        pill.type = "button";
+        pill.className = "equiv-pill";
+        pill.textContent = eq;
+        pill.addEventListener("click", () => {
+          applySubstitution(eq);
+        });
+        list.appendChild(pill);
+      });
+
+      card.appendChild(header);
+      card.appendChild(list);
+      subGroupsList.appendChild(card);
+    });
+
+    if (groups.length === 0) {
+      subGroupsList.innerHTML =
+        '<small style="color:#9ca3b4;">Nenhum grupo de substituições cadastrado para esta categoria.</small>';
+    }
+  }
+
+  function applySubstitution(text) {
+    if (!currentFoodForSub) return;
+    const { mealId, foodId } = currentFoodForSub;
+    const meal = state.meals.find((m) => m.id === mealId);
+    if (!meal) return;
+    const food = meal.foods.find((f) => f.id === foodId);
+    if (!food) return;
+    // Apenas substitui o nome do alimento; quantidade e unidade o coach ajusta
+    food.name = text;
+    saveState();
+    render();
+    closeSubstitutionModal();
+  }
+
+  // ==========================
+  // EVENTOS
+  // ==========================
+  document.addEventListener("DOMContentLoaded", () => {
+    loadState();
+    if (!state.meals || !Array.isArray(state.meals) || state.meals.length === 0) {
+      const m1 = createMeal();
+      m1.name = "Refeição 1";
+      m1.foods.push(createFood());
+      state.meals.push(m1);
+    }
+
+    if (!state.settings || typeof state.settings !== "object") {
+      state.settings = { fontFamily: "system", fontSize: 14 };
+    }
+
+    render();
+
+    // Dados do cliente
+    document.getElementById("clientName").addEventListener("input", (e) => {
+      state.client.name = e.target.value;
+      saveState();
+    });
+
+    document.getElementById("clientGoal").addEventListener("input", (e) => {
+      state.client.goal = e.target.value;
+      saveState();
+    });
+
+    document.getElementById("clientWeight").addEventListener("input", (e) => {
+      state.client.weight = e.target.value;
+      saveState();
+    });
+
+    document.getElementById("clientCalories").addEventListener("input", (e) => {
+      state.client.calories = e.target.value;
+      saveState();
+    });
+
+    document.getElementById("generalNotes").addEventListener("input", (e) => {
+      state.notes.general = e.target.value;
+      saveState();
+    });
+
+    // Toggle dia
+    document
+      .getElementById("dayTypeToggle")
+      .addEventListener("click", (e) => {
+        const btn = e.target.closest(".toggle-chip");
+        if (!btn) return;
+        const type = btn.getAttribute("data-day-type");
+        state.client.dayType = type;
+        saveState();
+        render();
+      });
+
+    // Fonte
+    document
+      .getElementById("fontFamilySelect")
+      .addEventListener("change", (e) => {
+        state.settings.fontFamily = e.target.value;
+        saveState();
+        applyFontFamily();
+      });
+
+    document.getElementById("fontSizeUp").addEventListener("click", () => {
+      state.settings.fontSize = Math.min(
+        (state.settings.fontSize || 14) + 1,
+        18
+      );
+      document.documentElement.style.setProperty(
+        "--base-font-size",
+        state.settings.fontSize + "px"
+      );
+      saveState();
+    });
+
+    document.getElementById("fontSizeDown").addEventListener("click", () => {
+      state.settings.fontSize = Math.max(
+        (state.settings.fontSize || 14) - 1,
+        10
+      );
+      document.documentElement.style.setProperty(
+        "--base-font-size",
+        state.settings.fontSize + "px"
+      );
+      saveState();
+    });
+
+    // Botão novo plano
+    document.getElementById("newPlanBtn").addEventListener("click", () => {
+      const ok = confirm(
+        "Tem certeza que deseja iniciar um novo plano? Isso limpa todas as refeições e observações salvas."
+      );
+      if (!ok) return;
+
+      state.client = {
+        name: "",
+        goal: "",
+        weight: "",
+        calories: "",
+        dayType: state.client.dayType || "treino"
+      };
+      state.notes = { general: "" };
+      state.meals = [];
+      const m1 = createMeal();
+      m1.name = "Refeição 1";
+      m1.foods.push(createFood());
+      state.meals.push(m1);
+      saveState();
+      render();
+    });
+
+    // Salvar manual
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      saveState();
+      alert("Plano salvo localmente neste navegador.");
+    });
+
+    // PDF
+    document.getElementById("pdfBtn").addEventListener("click", () => {
+      // garante estado atualizado pelos inputs antes de imprimir
+      saveState();
+      window.print();
+    });
+
+    // Adicionar refeição
+    document.getElementById("addMealBtn").addEventListener("click", () => {
+      const meal = createMeal();
+      meal.name = "Refeição " + (state.meals.length + 1);
+      meal.foods.push(createFood());
+      state.meals.push(meal);
+      saveState();
+      render();
+    });
+
+    // Delegação de eventos nas refeições/alimentos
+    document.getElementById("mealsList").addEventListener("click", (e) => {
+      const mealsList = document.getElementById("mealsList");
+      const mealCard = e.target.closest(".meal-card");
+      if (!mealCard) return;
+      const mealId = mealCard.dataset.mealId;
+      const mealIndex = state.meals.findIndex((m) => m.id === mealId);
+      if (mealIndex === -1) return;
+
+      const meal = state.meals[mealIndex];
+
+      // mover para cima
+      if (e.target.closest(".move-up")) {
+        if (mealIndex > 0) {
+          const tmp = state.meals[mealIndex - 1];
+          state.meals[mealIndex - 1] = meal;
+          state.meals[mealIndex] = tmp;
+          saveState();
+          render();
+        }
+        return;
+      }
+
+      // mover para baixo
+      if (e.target.closest(".move-down")) {
+        if (mealIndex < state.meals.length - 1) {
+          const tmp = state.meals[mealIndex + 1];
+          state.meals[mealIndex + 1] = meal;
+          state.meals[mealIndex] = tmp;
+          saveState();
+          render();
+        }
+        return;
+      }
+
+      // deletar refeição
+      if (e.target.closest(".delete-meal")) {
+        const ok = confirm("Remover esta refeição?");
+        if (!ok) return;
+        state.meals.splice(mealIndex, 1);
+        saveState();
+        render();
+        return;
+      }
+
+      // adicionar alimento
+      if (e.target.closest(".add-food-btn")) {
+        meal.foods.push(createFood());
+        saveState();
+        render();
+        return;
+      }
+
+      // ações de alimento
+      const foodRow = e.target.closest("tr[data-food-id]");
+      if (!foodRow) return;
+      const foodId = foodRow.dataset.foodId;
+      const food = meal.foods.find((f) => f.id === foodId);
+      if (!food) return;
+
+      // deletar alimento
+      if (e.target.closest(".delete-food")) {
+        const idx = meal.foods.findIndex((f) => f.id === foodId);
+        if (idx !== -1) {
+          meal.foods.splice(idx, 1);
+          saveState();
+          render();
+        }
+        return;
+      }
+
+      // abrir substituições
+      if (e.target.closest(".substitution")) {
+        openSubstitutionModal(meal.id, food.id, food.category || "carbs");
+        return;
+      }
+    });
+
+    document.getElementById("mealsList").addEventListener("input", (e) => {
+      const mealCard = e.target.closest(".meal-card");
+      if (!mealCard) return;
+      const mealId = mealCard.dataset.mealId;
+      const meal = state.meals.find((m) => m.id === mealId);
+      if (!meal) return;
+
+      if (e.target.classList.contains("meal-name-input")) {
+        meal.name = e.target.value;
+        saveState();
+        return;
+      }
+
+      if (e.target.classList.contains("meal-time-input")) {
+        meal.time = e.target.value;
+        saveState();
+        return;
+      }
+
+      if (e.target.classList.contains("meal-notes-input")) {
+        meal.notes = e.target.value;
+        saveState();
+        return;
+      }
+
+      const foodRow = e.target.closest("tr[data-food-id]");
+      if (foodRow) {
+        const foodId = foodRow.dataset.foodId;
+        const food = meal.foods.find((f) => f.id === foodId);
+        if (!food) return;
+
+        if (e.target.classList.contains("food-name")) {
+          food.name = e.target.value;
+        } else if (e.target.classList.contains("food-qty")) {
+          food.quantity = e.target.value;
+        } else if (e.target.classList.contains("food-unit")) {
+          food.unit = e.target.value;
+        } else if (e.target.classList.contains("food-notes")) {
+          food.notes = e.target.value;
+        }
+        saveState();
+      }
+    });
+
+    document.getElementById("mealsList").addEventListener("change", (e) => {
+      const mealCard = e.target.closest(".meal-card");
+      if (!mealCard) return;
+      const mealId = mealCard.dataset.mealId;
+      const meal = state.meals.find((m) => m.id === mealId);
+      if (!meal) return;
+
+      const foodRow = e.target.closest("tr[data-food-id]");
+      if (foodRow && e.target.classList.contains("food-category")) {
+        const foodId = foodRow.dataset.foodId;
+        const food = meal.foods.find((f) => f.id === foodId);
+        if (!food) return;
+        food.category = e.target.value;
+        saveState();
+      }
+    });
+
+    // modal substituições
+    subCategoryChips.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      const cat = chip.getAttribute("data-cat");
+      if (!currentFoodForSub) {
+        currentFoodForSub = { mealId: null, foodId: null, category: cat };
+      } else {
+        currentFoodForSub.category = cat;
+      }
+      const chips = subCategoryChips.querySelectorAll(".chip");
+      chips.forEach((c) => {
+        c.classList.toggle("active", c === chip);
+      });
+      renderSubstitutionGroups(cat);
+      const subtitle = document.getElementById("subModalSubtitle");
+      subtitle.textContent =
+        "Categoria atual: " +
+        categoryLabel(cat) +
+        ". Clique em uma opção para aplicar.";
+    });
+
+    document
+      .getElementById("subModalClose")
+      .addEventListener("click", closeSubstitutionModal);
+
+    subModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === subModalBackdrop) {
+        closeSubstitutionModal();
+      }
+    });
+  });
+</script>
+</body>
+</html>
