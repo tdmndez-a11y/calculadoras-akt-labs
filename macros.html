@@ -134,7 +134,7 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
   background:linear-gradient(180deg,#f97316,#fb923c);color:#1a1008;font-weight:700;
 }
 
-/* BLOCO DO GRÁFICO COMPARATIVO */
+/* BLOCO DO GRÁFICO DE MACROS */
 .chart-box{
   margin-top:10px;
   padding:10px 10px 8px;
@@ -176,8 +176,8 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
   height:8px;
   border-radius:999px;
 }
-.legend-train .legend-dot{background:#f97316;}   /* Treino */
-.legend-rest  .legend-dot{background:#38bdf8;}   /* Descanso */
+.legend-train .legend-dot{background:#f97316;} /* Treino */
+.legend-rest .legend-dot{background:#38bdf8;}  /* Descanso */
 
 @media print{
   body{background:#fff;color:#000}
@@ -330,6 +330,19 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
         <div class="small">Se vazio, usa os presets do objetivo.</div>
       </details>
 
+      <div class="row" style="margin-top:8px">
+        <div>
+          <label>Modo de fibra</label>
+          <select id="fiberMode">
+            <option value="range" selected>10–14 g / 1000 kcal (recomendado)</option>
+            <option value="fixed12">12 g / 1000 kcal (fixo)</option>
+          </select>
+        </div>
+        <div class="inline" style="align-items:flex-end">
+          <!-- Botões de perfil e PDF removidos -->
+        </div>
+      </div>
+
       <div id="alerts" style="margin-top:10px"></div>
     </section>
 
@@ -341,15 +354,15 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
       <div class="kpi"><div>TDEE</div><div class="v"><span id="tdeeOut">—</span> kcal</div></div>
       <div class="kpi"><div>Meta calórica (base)</div><div class="v"><span id="kcalTarget">—</span> kcal</div></div>
 
-      <!-- GRÁFICO COMPARATIVO TREINO x DESCANSO -->
+      <!-- GRÁFICO ÚNICO COMPARANDO DIAS -->
       <div class="chart-box">
-        <h3>Comparação treino × descanso (kcal por macro)</h3>
+        <h3>Comparação dos dias (kcal por macro)</h3>
         <div class="chart-wrapper">
-          <canvas id="macroChart" width="260" height="180"></canvas>
+          <canvas id="macroChart" width="280" height="180"></canvas>
         </div>
         <div class="chart-legend">
-          <span class="legend-item legend-train"><span class="legend-dot"></span>Dia de treino</span>
-          <span class="legend-item legend-rest"><span class="legend-dot"></span>Dia de descanso</span>
+          <span class="legend-item legend-train"><span class="legend-dot"></span>Treino</span>
+          <span class="legend-item legend-rest"><span class="legend-dot"></span>Descanso</span>
         </div>
       </div>
 
@@ -422,132 +435,108 @@ function fiberTarget(kcal, mode){
   return {min:Math.round(min), max:Math.round(max)};
 }
 
-/* ---- GRÁFICO BARRAS AGRUPADAS TREINO x DESCANSO ---- */
+/* ---- GRÁFICO DE BARRAS (TREINO x DESCANSO) ---- */
 let macroChartCtx = null;
 function initMacroChart(){
   const canvas = document.getElementById('macroChart');
   if(!canvas) return;
   macroChartCtx = canvas.getContext('2d');
 }
-function drawMacroChart(P, C_train, F_train, C_rest, F_rest){
+function drawCompareChart(train, rest){
   if(!macroChartCtx) return;
   const ctx = macroChartCtx;
   const canvas = ctx.canvas;
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // kcal por macro
-  const kP_train = P*4;
-  const kC_train = C_train*4;
-  const kF_train = F_train*9;
-  const kP_rest  = P*4;
-  const kC_rest  = C_rest*4;
-  const kF_rest  = F_rest*9;
-
-  if(!isFinite(kP_train + kC_train + kF_train + kP_rest + kC_rest + kF_rest) ||
-     (kP_train + kC_train + kF_train + kP_rest + kC_rest + kF_rest) <= 0){
-    return;
-  }
-
-  const groups = [
-    {label:'P', train:kP_train, rest:kP_rest},
-    {label:'C', train:kC_train, rest:kC_rest},
-    {label:'G', train:kF_train, rest:kF_rest}
+  // train/rest: {P,C,F} em g -> kcal
+  const tK = [
+    train.P*4,
+    train.C*4,
+    train.F*9
   ];
+  const rK = [
+    rest.P*4,
+    rest.C*4,
+    rest.F*9
+  ];
+  if(!tK.every(v=>isFinite(v)) || !rK.every(v=>isFinite(v))) return;
 
-  const maxVal = Math.max(...groups.flatMap(g=>[g.train,g.rest])) || 1;
+  const labels = ['P','C','G'];
+  const allVals = tK.concat(rK);
+  let maxVal = Math.max(...allVals);
+  if(maxVal <= 0) return;
+  maxVal *= 1.15;
 
-  const paddingLeft = 26;
-  const paddingRight = 10;
-  const paddingTop = 10;
-  const paddingBottom = 24;
+  const w = canvas.width;
+  const h = canvas.height;
+  const marginLeft = 26;
+  const marginRight = 8;
+  const marginTop = 10;
+  const marginBottom = 22;
 
-  const chartWidth = canvas.width - paddingLeft - paddingRight;
-  const chartHeight = canvas.height - paddingTop - paddingBottom;
+  const chartW = w - marginLeft - marginRight;
+  const chartH = h - marginTop - marginBottom;
+  const baseY = marginTop + chartH;
+  const scale = chartH / maxVal;
 
-  const nGroups = groups.length;
-  const groupWidth = chartWidth / nGroups;
-  const barWidth = groupWidth * 0.32;
-  const gapBars = groupWidth * 0.10;
-
-  // eixo Y
+  // Eixo
   ctx.strokeStyle = '#4b5563';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(paddingLeft, paddingTop);
-  ctx.lineTo(paddingLeft, paddingTop + chartHeight);
+  ctx.moveTo(marginLeft, baseY);
+  ctx.lineTo(w-marginRight, baseY);
   ctx.stroke();
 
-  // eixo X
-  ctx.beginPath();
-  ctx.moveTo(paddingLeft, paddingTop + chartHeight);
-  ctx.lineTo(paddingLeft + chartWidth, paddingTop + chartHeight);
-  ctx.stroke();
-
-  // linhas horizontais (grid leve)
-  ctx.strokeStyle = '#1f2933';
-  ctx.lineWidth = 0.5;
-  ctx.setLineDash([3,3]);
+  // Grid horizontal leve
+  ctx.font = '9px system-ui, -apple-system';
+  ctx.fillStyle = '#9ca3af';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
   const steps = 3;
   for(let i=1;i<=steps;i++){
-    const y = paddingTop + chartHeight - (chartHeight*(i/steps));
+    const val = maxVal*i/steps;
+    const y = baseY - val*scale;
+    ctx.strokeStyle = 'rgba(148,163,184,0.25)';
     ctx.beginPath();
-    ctx.moveTo(paddingLeft, y);
-    ctx.lineTo(paddingLeft + chartWidth, y);
+    ctx.moveTo(marginLeft, y);
+    ctx.lineTo(w-marginRight, y);
     ctx.stroke();
+    ctx.fillText(Math.round(val), marginLeft-4, y);
   }
-  ctx.setLineDash([]);
 
-  // barras
-  groups.forEach((g,idx)=>{
-    const baseX = paddingLeft + idx*groupWidth + groupWidth/2;
+  const groupWidth = chartW / labels.length;
+  const barWidth = groupWidth * 0.25;
+  const gap = barWidth * 0.3;
 
-    // treino
-    const hTrain = (g.train / maxVal) * chartHeight;
-    const xTrain = baseX - barWidth/2 - gapBars/2;
-    const yTrain = paddingTop + chartHeight - hTrain;
+  // Barras
+  labels.forEach((lab, i)=>{
+    const centerX = marginLeft + groupWidth*(i+0.5);
 
+    // Treino (laranja) - à esquerda
+    const tVal = tK[i];
+    const tH = tVal * scale;
+    const tX = centerX - barWidth/2 - gap/2;
+    const tY = baseY - tH;
     ctx.fillStyle = '#f97316';
-    ctx.fillRect(xTrain, yTrain, barWidth, hTrain);
+    ctx.beginPath();
+    ctx.roundRect(tX, tY, barWidth, tH, 3);
+    ctx.fill();
 
-    // descanso
-    const hRest = (g.rest / maxVal) * chartHeight;
-    const xRest = baseX + gapBars/2;
-    const yRest = paddingTop + chartHeight - hRest;
-
+    // Descanso (azul) - à direita
+    const rVal = rK[i];
+    const rH = rVal * scale;
+    const rX = centerX + gap/2;
+    const rY = baseY - rH;
     ctx.fillStyle = '#38bdf8';
-    ctx.fillRect(xRest, yRest, barWidth, hRest);
+    ctx.beginPath();
+    ctx.roundRect(rX, rY, barWidth, rH, 3);
+    ctx.fill();
 
-    // label do grupo (P/C/G)
+    // Label P/C/G
     ctx.fillStyle = '#e5e7eb';
-    ctx.font = '11px system-ui, -apple-system, BlinkMacSystemFont';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(g.label, baseX, paddingTop + chartHeight + 4);
-  });
-
-  // rótulos de valor no topo das barras (em kcal, arredondado)
-  ctx.font = '10px system-ui, -apple-system, BlinkMacSystemFont';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'bottom';
-
-  groups.forEach((g,idx)=>{
-    const baseX = paddingLeft + idx*groupWidth + groupWidth/2;
-
-    const hTrain = (g.train / maxVal) * chartHeight;
-    const xTrain = baseX - barWidth/2 - gapBars/2 + barWidth/2;
-    const yTrain = paddingTop + chartHeight - hTrain - 2;
-    if(hTrain > 8){
-      ctx.fillStyle = '#f97316';
-      ctx.fillText(Math.round(g.train), xTrain, yTrain);
-    }
-
-    const hRest = (g.rest / maxVal) * chartHeight;
-    const xRest = baseX + gapBars/2 + barWidth/2;
-    const yRest = paddingTop + chartHeight - hRest - 2;
-    if(hRest > 8){
-      ctx.fillStyle = '#38bdf8';
-      ctx.fillText(Math.round(g.rest), xRest, yRest);
-    }
+    ctx.fillText(lab, centerX, baseY+4);
   });
 }
 
@@ -654,7 +643,7 @@ function calculate(){
   const fiberTrain = fiberTarget(kcalTarget, fiberMode);
   const fiberRest  = fiberTarget(kcalRestTarget, fiberMode);
 
-  // REFEIÇÕES (treino)
+  // REFEIÇÕES (dia de treino)
   const mealRows = $('#mealRowsTrain'); mealRows.innerHTML='';
   const n = meals;
   const Pm = P / n;
@@ -691,13 +680,13 @@ function calculate(){
     mealRows.appendChild(tr);
   }
 
-  // TOTAIS TABELA
+  // TOTAIS
   $('#bmrOut').textContent  = isFinite(bmr)? round(bmr) : '—';
   $('#tdeeOut').textContent = isFinite(tdee)? round(tdee) : '—';
   $('#kcalTarget').textContent = isFinite(kcalTarget)? round(kcalTarget) : '—';
 
   const rows = [
-    {name:'Treino', kcal:kcalTarget, P:P, C:C_train, F:F_train, fiber:fiberTrain},
+    {name:'Treino',   kcal:kcalTarget,     P:P, C:C_train, F:F_train, fiber:fiberTrain},
     {name:'Descanso', kcal:kcalRestTarget, P:P, C:C_rest,  F:F_rest,  fiber:fiberRest},
   ];
   const tb = $('#macroRows'); tb.innerHTML='';
@@ -714,8 +703,11 @@ function calculate(){
     tb.appendChild(tr);
   }
 
-  // GRÁFICO: treino x descanso
-  drawMacroChart(P, C_train, F_train, C_rest, F_rest);
+  // Gráfico comparando dias
+  drawCompareChart(
+    {P:P, C:C_train, F:F_train},
+    {P:P, C:C_rest,  F:F_rest}
+  );
 
   const alerts = [];
   if(F < 0.6*weight) alerts.push('Gordura ficou abaixo de 0,6 g/kg (ajuste feito automaticamente).');
@@ -729,7 +721,7 @@ function calculate(){
 function debounce(fn, ms){
   let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); };
 }
-const debouncedCalc = debounce(calculate, 250);
+const debouncedCalc = debounce(calculate, 200);
 
 function attachRealtime(){
   const root = document.getElementById('formRoot');
@@ -752,18 +744,6 @@ function attachRealtime(){
     }
     debouncedCalc();
   });
-
-  const eq = document.getElementById('distEq');
-  const av = document.getElementById('distAv');
-  const hidden = document.getElementById('carbDistrib');
-  function setMode(mode){
-    hidden.value = mode;
-    eq.classList.toggle('active', mode==='equilibrado');
-    av.classList.toggle('active', mode==='avancado');
-    debouncedCalc();
-  }
-  eq.addEventListener('click', ()=>setMode('equilibrado'));
-  av.addEventListener('click', ()=>setMode('avancado'));
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
