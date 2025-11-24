@@ -1,712 +1,270 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AKT Labs — Calculadora de Macros por Objetivo (Realtime)</title>
-<style>
-:root{
-  --bg:#0b0c10; --panel:#12151b; --panel2:#0f131a; --ink:#e8edf2; --muted:#a7b0bd;
-  --accent:#f97316; --accent2:#fb923c; --line:#1f2733; --ok:#22c55e; --warn:#ef4444;
-  --radius:16px;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%); color:var(--ink);
-}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AKT Labs — Calculadora de Cargas (Brzycki)</title>
 
-/* CONTAINER MAIS LARGO / FULL WIDTH (MELHOR NO KIWIFY) */
-.wrapper{
-  width:100%;
-  max-width:100% !important;
-  margin:20px auto;
-  padding:0 12px;
-}
+  <style>
+    :root {
+      --bg: #05060a;
+      --panel: #0f131b;
+      --panel2: #121826;
+      --ink: #e8edf2;
+      --muted: #a7b0bd;
+      --accent: #f97316;
+      --accent-2: #fb923c;
+      --line: #1f2733;
+    }
 
-header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
-.logo{width:44px;height:44px;border-radius:12px;overflow:hidden;background:#fff}
-.logo img{width:100%;height:100%;object-fit:contain}
-h1{margin:0;font-size:clamp(18px,3vw,28px);letter-spacing:.2px}
-.sub{color:var(--muted);font-size:13px;margin-top:2px}
+    * {
+      box-sizing: border-box;
+    }
 
-/* GRID PRINCIPAL */
-.grid{
-  display:grid;
-  grid-template-columns:1.05fr .95fr;
-  gap:16px;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
 
-/* Quebra mais cedo pra evitar ficar espremida em telas menores */
-@media (max-width:1200px){
-  .grid{grid-template-columns:1fr;}
-}
+    .wrap {
+      width: 100%;
+      max-width: 960px;
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    }
 
-/* Ajustes de header e espaçamento em telas pequenas */
-@media (max-width:700px){
-  .wrapper{
-    padding:0 8px;
-    margin:16px auto;
-  }
-  header{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-}
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
 
-/* CARTÕES */
-.card{
-  background:linear-gradient(180deg,#151922 0%, #0f141c 100%);
-  border:1px solid var(--line); border-radius:var(--radius); padding:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      flex-shrink: 0;
+    }
 
-/* Menos sombra em mobile pra parecer app nativo em full width */
-@media (max-width:600px){
-  .card{
-    border-radius:14px;
-    padding:14px;
-    box-shadow:none;
-  }
-}
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
 
-.card h2{margin:0 0 10px;font-size:18px}
+    h1 {
+      margin: 0;
+      font-size: clamp(18px, 3vw, 24px);
+    }
 
-.row{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px
-}
-@media (max-width:860px){
-  .row{grid-template-columns:1fr}
-}
+    .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
 
-label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
-input,select,button{font-family:inherit}
-input,select{
-  width:100%; padding:12px; border-radius:12px; border:1px solid #273040;
-  background:var(--panel2); color:var(--ink); outline:none
-}
-input[type="range"]{padding:0}
-input:focus,select:focus{border-color:var(--accent)}
-.small{font-size:12px;color:var(--muted)}
-.kpi{
-  display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;
-  background:#0e1522;border:1px solid #1f2a3c;margin:8px 0
-}
-.kpi .v{font-weight:800}
-.inline{display:flex;gap:10px;flex-wrap:wrap}
-.btn{
-  padding:10px 14px;border:1px solid #2a3548;background:#0f141c;color:#fff;border-radius:12px;
-  cursor:pointer
-}
-.btn:hover{border-color:var(--accent);box-shadow:0 0 0 2px inset rgba(249,115,22,.15)}
-.btn.primary{background:linear-gradient(180deg,#f97316,#fb923c);border-color:#a84d0e;color:#1a1008;font-weight:700}
-.tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
-.tbl th{background:#0f1524;color:#d7e0ea}
-.tbl tr:nth-child(even){background:#0e1320}
-.warn{color:#fff;background:#2b0f13;border:1px solid #5c1b23;padding:10px;border-radius:12px}
-.ok{color:#05210f;background:#0f2d1a;border:1px solid #1f5933;padding:10px;border-radius:12px}
-hr{border:none;border-top:1px solid var(--line);margin:14px 0}
-footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
-.hidden{display:none!important}
-.flex-between{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
-.toggle{
-  display:inline-flex;gap:6px;background:#0f141c;border:1px solid #273040;border-radius:12px;padding:4px;
-}
-.toggle button{
-  border:none;background:transparent;color:#cbd5e1;padding:8px 12px;border-radius:10px;cursor:pointer;
-}
-.toggle button.active{
-  background:linear-gradient(180deg,#f97316,#fb923c);color:#1a1008;font-weight:700;
-}
-@media print{
-  body{background:#fff;color:#000}
-  .card{box-shadow:none;border-color:#ccc}
-  .btn,.small,.sub{display:none!important}
-  a[href]:after{content:""}
-}
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <header>
-    <div class="logo"><img src="Logo fundo branco 01 (1) (1).png" alt="AKT" onerror="this.parentElement.style.display='none'"/></div>
-    <div>
-      <h1>Calculadora de Macros por Objetivo — AKT Labs</h1>
-      <div class="sub">Realtime (sem botão) · BMR (Katch/Mifflin/Harris) · NEAT · Presets por objetivo · Carb cycling · Fibras · PDF</div>
-    </div>
-  </header>
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
 
-  <div class="grid">
-    <!-- ENTRADAS -->
-    <section class="card" id="formRoot">
-      <h2>Entradas</h2>
-
-      <div class="row">
-        <div>
-          <label>Sexo</label>
-          <select id="sex">
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-          </select>
-        </div>
-        <div>
-          <label>Idade (anos)</label>
-          <input id="age" type="number" min="16" max="80" value="28"/>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Altura (cm)</label>
-          <input id="height" type="number" min="130" max="210" value="178"/>
-        </div>
-        <div>
-          <label>Peso (kg)</label>
-          <input id="weight" type="number" min="35" max="200" step="0.1" value="82"/>
-        </div>
-      </div>
-
-      <div class="row">
-        <div id="bfWrap" class="hidden">
-          <label>% Gordura (Katch-McArdle)</label>
-          <input id="bf" type="number" min="3" max="60" step="0.1" placeholder="ex.: 12"/>
-        </div>
-        <div>
-          <label>Fórmula de BMR</label>
-          <select id="bmrFormula">
-            <option value="auto">Automático (Katch se %BF, senão Mifflin)</option>
-            <option value="katch">Katch-McArdle</option>
-            <option value="mifflin">Mifflin–St Jeor</option>
-            <option value="harris">Harris-Benedict</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Atividade</label>
-          <select id="activity">
-            <option value="1.2">Sedentário (sem treino) — 1.20</option>
-            <option value="1.375">Levemente ativo (1–2 treinos leves/semana) — 1.375</option>
-            <option value="1.55" selected>Moderado (3–5 treinos regulares/semana) — 1.55</option>
-            <option value="1.725">Muito ativo (5–6 treinos intensos/semana) — 1.725</option>
-            <option value="1.9">Extremamente ativo (atleta/2x ao dia) — 1.90</option>
-          </select>
-        </div>
-        <div>
-          <label>NEAT (ajuste fino — movimentos do dia)</label>
-          <input id="neat" type="range" min="-15" max="15" step="1" value="0" oninput="document.getElementById('neatVal').textContent=this.value+'%'"/>
-          <div class="flex-between"><span>menos movimentação</span><span>mais movimentação</span></div>
-          <div class="small">Ajuste atual: <span id="neatVal">0%</span></div>
-        </div>
-      </div>
-
-      <hr/>
-
-      <div class="row">
-        <div>
-          <label>Objetivo</label>
-          <select id="goal">
-            <option value="cut_agg">Cut agressivo</option>
-            <option value="cut">Cut</option>
-            <option value="recomp">Recomp</option>
-            <option value="lean">Lean Bulk</option>
-            <option value="bulk">Bulk agressivo</option>
-          </select>
-        </div>
-        <div>
-          <label>Velocidade de mudança (kg/semana)</label>
-          <input id="rate" type="range" min="-1.50" max="1.00" step="0.05" value="-1.00"
-                 oninput="document.getElementById('rateVal').textContent=this.value+' kg/sem'"/>
-          <div class="small">Atual: <span id="rateVal">-1.00 kg/sem</span></div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Dias de treino/semana</label>
-          <input id="trainDays" type="number" min="0" max="7" value="5"/>
-        </div>
-        <div>
-          <label>Carb cycling — ajuste no dia de treino</label>
-          <input id="trainCarbAdj" type="range" min="0" max="30" step="1" value="15"
-                 oninput="document.getElementById('carbAdjVal').textContent='+'+this.value+'% C (treino)'"/>
-          <div class="small">Atual: <span id="carbAdjVal">+15% C (treino)</span></div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Distribuição de carbo por refeição</label>
-          <div class="toggle" role="group" aria-label="Distribuição de carboidratos">
-            <button type="button" id="distEq" class="active" data-mode="equilibrado">Equilibrado</button>
-            <button type="button" id="distAv" data-mode="avancado">Avançado</button>
-          </div>
-          <input type="hidden" id="carbDistrib" value="equilibrado"/>
-        </div>
-        <div>
-          <label>Nº de refeições/dia</label>
-          <input id="meals" type="number" min="2" max="8" value="4"/>
-        </div>
-      </div>
-
-      <details style="margin-top:8px">
-        <summary class="small">Avançado — ajustes de macros (g/kg)</summary>
-        <div class="row" style="margin-top:8px">
-          <div>
-            <label>Proteína (g/kg)</label>
-            <input id="p_kg" type="number" min="1.6" max="3.0" step="0.1" placeholder="auto"/>
-          </div>
-          <div>
-            <label>Gorduras (g/kg)</label>
-            <input id="f_kg" type="number" min="0.6" max="1.2" step="0.1" placeholder="auto"/>
-          </div>
-        </div>
-        <div class="small">Se vazio, usa os presets do objetivo.</div>
-      </details>
-
-      <div class="row" style="margin-top:8px">
-        <div>
-          <label>Modo de fibra</label>
-          <select id="fiberMode">
-            <option value="range" selected>10–14 g / 1000 kcal (recomendado)</option>
-            <option value="fixed12">12 g / 1000 kcal (fixo)</option>
-          </select>
-        </div>
-        <div class="inline" style="align-items:flex-end">
-          <button class="btn" id="saveBtn">Salvar perfil</button>
-          <button class="btn" id="loadBtn">Carregar perfil</button>
-          <button class="btn" onclick="window.print()">Salvar PDF</button>
-        </div>
-      </div>
-
-      <div id="alerts" style="margin-top:10px"></div>
-    </section>
-
-    <!-- SAÍDAS -->
-    <aside class="card">
-      <h2>Resultados</h2>
-
-      <div class="kpi"><div>BMR</div><div class="v"><span id="bmrOut">—</span> kcal</div></div>
-      <div class="kpi"><div>TDEE</div><div class="v"><span id="tdeeOut">—</span> kcal</div></div>
-      <div class="kpi"><div>Meta calórica (base)</div><div class="v"><span id="kcalTarget">—</span> kcal</div></div>
-
-      <table class="tbl" style="margin-top:10px">
-        <thead><tr><th>Dia</th><th>kcal</th><th>Proteína (g)</th><th>Carbo (g)</th><th>Gordura (g)</th><th>Fibra (g)</th></tr></thead>
-        <tbody id="macroRows">
-          <tr><td>Treino</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td>Descanso</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-        </tbody>
-      </table>
-
-      <h3 style="margin:12px 0 8px;font-size:16px">Distribuição por refeição (dia de treino)</h3>
-      <table class="tbl" id="mealTable">
-        <thead><tr><th>Refeição</th><th>kcal</th><th>P (g)</th><th>C (g)</th><th>G (g)</th></tr></thead>
-        <tbody id="mealRowsTrain"></tbody>
-      </table>
-      <div class="small" style="margin-top:6px">No modo <b>Avançado</b>, a calculadora concentra ~30% dos carboidratos no <b>pré</b> e ~40% no <b>pós-treino</b>. O restante é dividido igualmente nas demais refeições.</div>
-    </aside>
-  </div>
-
-  <footer>© AKT Labs — ferramenta educativa. Ajustes finos devem ser feitos por check-ins e resposta individual.</footer>
-</div>
-
-<script>
-const $ = (q)=>document.querySelector(q);
-
-// ---- BMR ----
-function bmrKatch(weight, bf){
-  const lbm = weight * (1 - (bf/100));
-  return 370 + 21.6 * lbm;
-}
-function bmrMifflin(sex, weight, height, age){
-  return (10*weight + 6.25*height - 5*age + (sex==='M'? 5 : -161));
-}
-function bmrHarris(sex, weight, height, age){
-  if(sex==='M') return 88.362 + 13.397*weight + 4.799*height - 5.677*age;
-  return 447.593 + 9.247*weight + 3.098*height - 4.330*age;
-}
-
-const clamp = (v,min,max)=>Math.min(max,Math.max(min,v));
-const round1 = v => Math.round(v*10)/10;
-const round = v => Math.round(v);
-
-function presetMacros(goal){
-  if(goal==='cut' || goal==='cut_agg')   return {p_kg:2.3, f_kg:0.7};
-  if(goal==='recomp')return {p_kg:2.1, f_kg:0.8};
-  if(goal==='lean')  return {p_kg:1.9, f_kg:0.8};
-  if(goal==='bulk')  return {p_kg:1.7, f_kg:0.9};
-  return {p_kg:2.0, f_kg:0.8};
-}
-function defaultRateKg(goal){
-  if(goal==='cut_agg') return -1.00;
-  if(goal==='cut')     return -0.50;
-  if(goal==='recomp')  return  0.00;
-  if(goal==='lean')    return  0.50;
-  if(goal==='bulk')    return  1.00;
-  return 0.00;
-}
-function fiberTarget(kcal, mode){
-  const per = (mode==='fixed12'? 12 : null);
-  if(per){ const g = kcal/1000*per; return {min:Math.round(g), max:Math.round(g)}; }
-  const min = kcal/1000*10, max = kcal/1000*14;
-  return {min:Math.round(min), max:Math.round(max)};
-}
-
-function calculate(){
-  const sex = $('#sex').value;
-  const age = parseFloat($('#age').value||0);
-  const height = parseFloat($('#height').value||0);
-  const weight = parseFloat($('#weight').value||0);
-  const bf = parseFloat($('#bf').value||NaN);
-  const bmrFormula = $('#bmrFormula').value;
-  const activity = parseFloat($('#activity').value);
-  const neat = parseFloat($('#neat').value||0) / 100;
-  const goal = $('#goal').value;
-  const rateKg = parseFloat($('#rate').value); // kg/sem
-  const trainDays = clamp(parseInt($('#trainDays').value||0),0,7);
-  const carbAdj = parseFloat($('#trainCarbAdj').value)/100;
-  const carbDistrib = $('#carbDistrib').value;
-  const meals = clamp(parseInt($('#meals').value||4),2,8);
-  const fiberMode = $('#fiberMode').value;
-
-  const ps = presetMacros(goal);
-  const p_kg = parseFloat($('#p_kg').value||ps.p_kg);
-  const f_kg = parseFloat($('#f_kg').value||ps.f_kg);
-
-  // BMR
-  let bmr=0;
-  if(bmrFormula==='katch'){
-    const bfUse = isNaN(bf)? 15 : bf;
-    $('#bfWrap').classList.remove('hidden');
-    bmr = bmrKatch(weight, bfUse);
-  }else{
-    $('#bfWrap').classList.add('hidden');
-    bmr = (bmrFormula==='mifflin' || bmrFormula==='auto')
-      ? bmrMifflin(sex, weight, height, age)
-      : bmrHarris(sex, weight, height, age);
-  }
-
-  // TDEE
-  let tdee = bmr * activity * (1 + neat);
-
-  // Déficit/superávit via velocidade em kg/semana
-  const kgWeek = rateKg; // já em kg/sem
-  const deltaDay = (kgWeek * 7700) / 7;
-  const kcalTarget = tdee + deltaDay;
-
-  // Macros base (dia genérico)
-  let P = clamp(p_kg * weight, 1.6*weight, 3.0*weight);
-  let F = Math.max(f_kg * weight, 0.6*weight);
-  let C = Math.max(0, (kcalTarget - (P*4 + F*9))/4);
-
-  if(C < 0){
-    const kcalNeed = (P*4 + F*9);
-    if(kcalNeed > kcalTarget){
-      const maxReducibleF = F - 0.6*weight;
-      const kcalOver = kcalNeed - kcalTarget;
-      const fReduce = Math.min(maxReducibleF, kcalOver/9);
-      F = F - fReduce;
-      C = Math.max(0,(kcalTarget - (P*4 + F*9))/4);
-      if(C < 0){
-        const maxReducibleP = P - 1.6*weight;
-        const kcalOver2 = (P*4 + F*9) - kcalTarget;
-        const pReduce = Math.min(maxReducibleP, kcalOver2/4);
-        P = P - pReduce;
-        C = Math.max(0,(kcalTarget - (P*4 + F*9))/4);
+    @media (max-width: 780px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .wrap {
+        padding: 14px;
+        border-radius: 14px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
-  }
 
-  // ----- TREINO: carb-cycling -----
-  let C_train = C * (1 + carbAdj);
-  let F_train = F;
-  {
-    const kcalCdiff = (C_train - C) * 4;
-    const fDiff = kcalCdiff / 9;
-    F_train = Math.max(0.6*weight, F - fDiff);
-    const kcalLeft = kcalTarget - (P*4 + F_train*9);
-    const C_train_fix = Math.max(0, kcalLeft/4);
-    if(Math.abs(C_train_fix - C_train) > 0.5) C_train = C_train_fix;
-  }
-
-  // ----- DESCANSO: carb-cycling e -10% kcal -----
-  let C_rest = C * (1 - carbAdj);
-  let F_rest = F + ((C - C_rest)*4)/9; // compensa com gordura a retirada de C
-  const kcalRestTarget = kcalTarget * 0.90; // -10% no descanso
-  let kcalRestNow = P*4 + F_rest*9 + C_rest*4;
-  if(kcalRestNow > kcalRestTarget){
-    // reduzir preferencialmente carbo
-    let need = kcalRestNow - kcalRestTarget;
-    let reduceC = Math.min(C_rest, need/4);
-    C_rest -= reduceC;
-    need -= reduceC*4;
-    // se ainda sobrar, reduzir gordura mantendo >=0.6 g/kg
-    if(need > 0){
-      const maxReduceF = Math.max(0, F_rest - 0.6*weight);
-      const reduceF = Math.min(maxReduceF, need/9);
-      F_rest -= reduceF;
-      need -= reduceF*9;
-    }
-    // se ainda sobrar, reduzir proteína mantendo >=1.6 g/kg (caso extremo)
-    if(need > 0){
-      const maxReduceP = Math.max(0, P - 1.6*weight);
-      const reduceP = Math.min(maxReduceP, need/4);
-      P -= reduceP;
-      need -= reduceP*4;
-    }
-    kcalRestNow = P*4 + F_rest*9 + C_rest*4;
-  }
-
-  const fiberTrain = fiberTarget(kcalTarget, fiberMode);
-  const fiberRest  = fiberTarget(kcalRestTarget, fiberMode);
-
-  // ---- Distribuição por refeição (treino) ----
-  const mealRows = $('#mealRowsTrain'); mealRows.innerHTML='';
-  const n = meals;
-  // Proteína e gordura divididas igualmente
-  const Pm = P / n;
-  const Gm = F_train / n;
-
-  // Carboidratos — equilibrado ou avançado
-  let carbsPerMeal = Array(n).fill(0);
-  if(carbDistrib === 'equilibrado'){
-    carbsPerMeal = carbsPerMeal.map(()=> C_train / n);
-  }else{
-    // Avançado: prioriza pré (30%) e pós (40%); restante divide nas outras refeições
-    const preShare = 0.30, postShare = 0.40;
-    const baseShare = 1 - (preShare + postShare); // 30% restantes
-    const others = Math.max(n - 2, 1);
-    const eachOther = baseShare / others;
-    for(let i=0;i<n;i++){
-      if(n>=3 && i===1) carbsPerMeal[i] = C_train * preShare;    // Refeição 2 = pré
-      else if(n>=3 && i===2) carbsPerMeal[i] = C_train * postShare; // Refeição 3 = pós
-      else carbsPerMeal[i] = C_train * (n>=3 ? eachOther : 0.5);
-    }
-  }
-
-  for(let i=0;i<n;i++){
-    const P_i = Pm;
-    const C_i = carbsPerMeal[i];
-    const G_i = Gm;
-    const kcal_i = Math.round(P_i*4 + C_i*4 + G_i*9);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>Refeição ${i+1}</td>
-      <td>${kcal_i}</td>
-      <td>${round1(P_i)}</td>
-      <td>${round(C_i)}</td>
-      <td>${round1(G_i)}</td>
-    `;
-    mealRows.appendChild(tr);
-  }
-
-  // ---- Render totais ----
-  $('#bmrOut').textContent  = isFinite(bmr)? round(bmr) : '—';
-  $('#tdeeOut').textContent = isFinite(tdee)? round(tdee) : '—';
-  $('#kcalTarget').textContent = isFinite(kcalTarget)? round(kcalTarget) : '—';
-
-  const rows = [
-    {name:'Treino', kcal:kcalTarget, P:P, C:C_train, F:F_train, fiber:fiberTrain},
-    {name:'Descanso', kcal:kcalRestTarget, P:P, C:C_rest,  F:F_rest,  fiber:fiberRest},
-  ];
-  const tb = $('#macroRows'); tb.innerHTML='';
-  for(const r of rows){
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${r.name}</td>
-      <td>${isFinite(r.kcal)? round(r.kcal):'—'}</td>
-      <td>${isFinite(r.P)? round1(r.P):'—'}</td>
-      <td>${isFinite(r.C)? round(r.C):'—'}</td>
-      <td>${isFinite(r.F)? round1(r.F):'—'}</td>
-      <td>${(r.fiber.min===r.fiber.max)? r.fiber.min : r.fiber.min+'–'+r.fiber.max}</td>
-    `;
-    tb.appendChild(tr);
-  }
-
-  const alerts = [];
-  if(F < 0.6*weight) alerts.push('Gordura ficou abaixo de 0,6 g/kg (ajuste feito automaticamente).');
-  if(P < 1.6*weight) alerts.push('Proteína ficou abaixo de 1,6 g/kg (ajuste feito automaticamente).');
-  document.getElementById('alerts').innerHTML = alerts.length
-    ? `<div class="warn">${alerts.map(a=>`• ${a}`).join('<br/>')}</div>`
-    : `<div class="ok">Cálculo atualizado em tempo real.</div>`;
-
-  window.__lastCalc__ = {
-    inputs:{sex,age,height,weight,bf,bmrFormula,activity,neat,goal,rateKg,trainDays,carbAdj,carbDistrib,meals,fiberMode,p_kg,f_kg},
-    outputs:{
-      bmr, tdee, kcalTarget: round(kcalTarget),
-      treino:{P:round1(P), C:round(C_train), F:round1(F_train), kcal:round(kcalTarget), fiber:fiberTrain},
-      descanso:{P:round1(P), C:round(C_rest),  F:round1(F_rest),  kcal:round(kcalRestTarget), fiber:fiberRest},
-      meals:meals
-    }
-  };
-}
-
-// Salvar / carregar perfil
-function saveProfile(){
-  const keys = ['sex','age','height','weight','bf','bmrFormula','activity','neat','goal','rate','trainDays','trainCarbAdj','carbDistrib','meals','fiberMode','p_kg','f_kg'];
-  const obj = {};
-  for(const k of keys){
-    const el = document.getElementById(k);
-    obj[k] = el ? el.value : null;
-  }
-  localStorage.setItem('akt_macros_profile', JSON.stringify(obj));
-  alert('Perfil salvo neste navegador.');
-}
-function loadProfile(){
-  const raw = localStorage.getItem('akt_macros_profile');
-  if(!raw){ alert('Nenhum perfil salvo.'); return; }
-  const obj = JSON.parse(raw);
-  for(const k in obj){
-    const el = document.getElementById(k);
-    if(el && obj[k]!=null){ el.value = obj[k]; }
-  }
-  document.getElementById('neatVal').textContent = (document.getElementById('neat').value||0)+'%';
-  document.getElementById('rateVal').textContent = (document.getElementById('rate').value||0)+' kg/sem';
-  document.getElementById('carbAdjVal').textContent = '+'+(document.getElementById('trainCarbAdj').value||0)+'% C (treino)';
-  calculate();
-}
-
-// Reatividade
-function debounce(fn, ms){
-  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); };
-}
-const debouncedCalc = debounce(calculate, 250);
-
-function attachRealtime(){
-  const root = document.getElementById('formRoot');
-  root.addEventListener('input', (e)=>{
-    if(e.target.id==='neat') document.getElementById('neatVal').textContent=e.target.value+'%';
-    if(e.target.id==='rate') document.getElementById('rateVal').textContent=e.target.value+' kg/sem';
-    if(e.target.id==='trainCarbAdj') document.getElementById('carbAdjVal').textContent = '+'+e.target.value+'% C (treino)';
-    debouncedCalc();
-  });
-  root.addEventListener('change', (e)=>{
-    if(e.target.id==='bmrFormula'){
-      const showBF = e.target.value==='katch';
-      document.getElementById('bfWrap').classList.toggle('hidden', !showBF);
-    }
-    if(e.target.id==='goal'){
-      const kg = defaultRateKg(e.target.value);
-      const rate = document.getElementById('rate');
-      rate.value = kg.toFixed(2);
-      document.getElementById('rateVal').textContent = rate.value+' kg/sem';
-    }
-    debouncedCalc();
-  });
-  // Toggle buttons for carb distribution
-  const eq = document.getElementById('distEq');
-  const av = document.getElementById('distAv');
-  const hidden = document.getElementById('carbDistrib');
-  function setMode(mode){
-    hidden.value = mode;
-    eq.classList.toggle('active', mode==='equilibrado');
-    av.classList.toggle('active', mode==='avancado');
-    debouncedCalc();
-  }
-  eq.addEventListener('click', ()=>setMode('equilibrado'));
-  av.addEventListener('click', ()=>setMode('avancado'));
-
-  document.getElementById('saveBtn').addEventListener('click', saveProfile);
-  document.getElementById('loadBtn').addEventListener('click', loadProfile);
-}
-
-window.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('neatVal').textContent=(document.getElementById('neat').value||0)+'%';
-  const g = document.getElementById('goal').value;
-  const kg = defaultRateKg(g);
-  const rate = document.getElementById('rate');
-  rate.value = kg.toFixed(2);
-  document.getElementById('rateVal').textContent = rate.value+' kg/sem';
-  document.getElementById('carbAdjVal').textContent = '+'+(document.getElementById('trainCarbAdj').value||0)+'% C (treino)';
-  const formulaSel = document.getElementById('bmrFormula').value;
-  document.getElementById('bfWrap').classList.toggle('hidden', formulaSel!=='katch');
-  attachRealtime();
-  calculate();
-});
-</script>
-</body>
-</html>
-    @media (max-width:780px){
-      .row{grid-template-columns:1fr}
+    .card {
+      background: radial-gradient(circle at top left, rgba(249, 115, 22, 0.08), transparent 60%),
+        var(--panel2);
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
     }
 
-    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-    input,select{
-      width:100%;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid #273040;
-      background:var(--shade);
-      color:var(--ink);
-      outline:none;
-    }
-    input:focus,select:focus{border-color:var(--accent)}
-
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    button{
-      padding:10px 14px;
-      border-radius:12px;
-      border:1px solid #253044;
-      background:var(--shade);
-      color:var(--ink);
-      cursor:pointer;
-    }
-    button.primary{
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#071018;
-      border-color:transparent;
-      font-weight:800;
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      border:1px solid var(--line);
-      border-radius:12px;
-      overflow:hidden;
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    th,td{
-      padding:10px;
-      border-bottom:1px solid var(--line);
-      text-align:left;
-    }
-    th{background:#0f1524;color:#d7e0ea}
-    tr:nth-child(even){background:#0e1320}
 
-    .kpi{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px;
-      border-radius:14px;
-      background:#0e1522;
-      border:1px solid #1f2a3c;
-      margin-bottom:10px;
+    @media (max-width: 780px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
     }
-    .kpi .v{font-size:22px;font-weight:800}
-    .tiny{font-size:11px;color:#a7b0bd}
-    .ok{color:var(--ok)}
-    .warn{color:var(--warn)}
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 11px;
+      border-radius: 12px;
+      border: 1px solid #273040;
+      background: #020617;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.3);
+    }
+
+    .tiny {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 9px 14px;
+      border-radius: 12px;
+      border: 1px solid #253044;
+      background: #020617;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0b0b11;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 8px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    th {
+      background: #0f172a;
+      color: #d7e0ea;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 11px;
+    }
+
+    tr:nth-child(even) {
+      background: #020617;
+    }
+
+    .kpi {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .kpi .v {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .ok {
+      color: #22c55e;
+    }
+
+    .warn {
+      color: #f97316;
+    }
+
+    .sep {
+      height: 1px;
+      background: var(--line);
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="logo">
-        <img src="Logo fundo branco 01 (1) (1).png" alt="AKT Logo" onerror="this.style.display='none'"/>
+        <img
+          src="Logo fundo branco 01 (1) (1).png"
+          alt="AKT Logo"
+          onerror="this.style.display='none'"
+        />
       </div>
       <div>
         <h1>Calculadora de Cargas — Brzycki</h1>
-        <div class="sub">Estime 1RM e cargas por % e por repetições usando a equação de Brzycki.</div>
+        <div class="sub">
+          Estime 1RM e cargas por % ou reps usando a equação de Brzycki, com arredondamento para a menor
+          anilha da academia.
+        </div>
       </div>
     </header>
 
     <div class="grid">
+      <!-- ENTRADAS -->
       <section class="card">
         <h2>Entradas</h2>
+
         <div class="row">
           <div>
             <label for="unit">Unidade</label>
@@ -725,53 +283,65 @@ window.addEventListener('DOMContentLoaded', ()=>{
             </select>
           </div>
         </div>
+
         <div class="row">
           <div>
             <label for="lifted">Carga levantada (unidade)</label>
-            <input id="lifted" type="number" min="1" step="0.5" placeholder="100">
+            <input id="lifted" type="number" min="1" step="0.5" placeholder="100" />
           </div>
           <div>
             <label for="reps">Reps realizadas</label>
-            <input id="reps" type="number" min="1" max="20" step="1" placeholder="6">
+            <input id="reps" type="number" min="1" max="20" step="1" placeholder="6" />
           </div>
         </div>
+
         <div class="tiny">
-          Fórmula de Brzycki: <code>1RM = Peso × 36 / (37 − reps)</code>. Precisão ideal até ~10–12 reps.
+          Fórmula de Brzycki: <code>1RM = Peso × 36 / (37 − reps)</code>. Melhor precisão até ~10–12 reps.
         </div>
+
         <div class="actions">
           <button class="primary" id="calcBtn">Calcular</button>
           <button id="resetBtn">Limpar</button>
           <button id="copyBtn">Copiar resumo</button>
         </div>
+
         <div id="msg" class="tiny"></div>
       </section>
 
+      <!-- SAÍDAS -->
       <aside class="card">
         <h2>Resultados</h2>
+
         <div class="kpi">
           <div>1RM estimado</div>
           <div class="v" id="oneRM">—</div>
         </div>
+
         <div class="kpi">
           <div>Carga para o alvo</div>
           <div class="v" id="targetLoad">—</div>
         </div>
-        <div class="row">
+
+        <div class="row" style="margin-top: 8px">
           <div>
             <label for="targetPct">Alvo por % do 1RM</label>
-            <input id="targetPct" type="number" min="30" max="100" step="1" placeholder="80">
+            <input id="targetPct" type="number" min="30" max="100" step="1" placeholder="80" />
           </div>
           <div>
             <label for="targetReps">Alvo por reps</label>
-            <input id="targetReps" type="number" min="1" max="20" step="1" placeholder="5">
+            <input id="targetReps" type="number" min="1" max="20" step="1" placeholder="5" />
           </div>
         </div>
+
         <div class="tiny">
-          Preencha % ou reps para ver a carga sugerida (usa Brzycki para converter reps→% e vice-versa).
+          Preencha <strong>%</strong> ou <strong>reps</strong> para ver a carga sugerida.  
+          A conversão reps ↔ % também usa Brzycki.
         </div>
+
         <div class="sep"></div>
-        <h2>Tabela por zonas</h2>
-        <div style="max-height:360px;overflow:auto">
+
+        <h2 style="margin-top: 4px">Tabela por zonas</h2>
+        <div style="max-height: 340px; overflow: auto; margin-top: 6px">
           <table id="tableZones">
             <thead>
               <tr>
@@ -788,178 +358,106 @@ window.addEventListener('DOMContentLoaded', ()=>{
   </div>
 
   <script>
-    const $ = (q)=>document.querySelector(q);
+    const $ = (q) => document.querySelector(q);
 
-    function roundTo(x, step){ return Math.round(x/step)*step; }
-    function brzycki1RM(w, r){ if(r<=0 || r>=37) return NaN; return w * 36 / (37 - r); }
-    function pctFromReps(r){ return (37 - r)/36; }
-    function repsFromPct(p){ return 37 - 36*p; }
-
-    function fmtLoad(x){
-      const step=parseFloat($('#rounding').value)||1;
-      const v=roundTo(x,step);
-      const u=$('#unit').value;
-      return Number.isFinite(v)? v.toFixed(1)+' '+u:'—';
+    function roundTo(x, step) {
+      return Math.round(x / step) * step;
     }
 
-    function compute(){
-      const lifted=parseFloat($('#lifted').value);
-      const reps=parseInt($('#reps').value);
-      if(!lifted||!reps) throw new Error('Informe carga e reps.');
-      const oneRM=brzycki1RM(lifted,reps);
-      if(!Number.isFinite(oneRM)) throw new Error('Reps fora de intervalo válido.');
+    function brzycki1RM(w, r) {
+      if (r <= 0 || r >= 37) return NaN;
+      return (w * 36) / (37 - r);
+    }
 
-      // alvo (opcional)
-      const pct=parseFloat($('#targetPct').value);
-      const repsT=parseInt($('#targetReps').value);
-      let target=null;
-      if(pct) target=oneRM*(pct/100);
-      else if(repsT) target=oneRM*pctFromReps(repsT);
+    function pctFromReps(r) {
+      return (37 - r) / 36;
+    }
 
-      // Tabela por zonas de %1RM
-      const tbody=$('#tableZones tbody'); tbody.innerHTML='';
-      const unit=$('#unit').value;
-      const step=parseFloat($('#rounding').value)||1;
-      for(let p=100; p>=50; p-=5){
-        const perc = p/100;
+    function repsFromPct(p) {
+      return 37 - 36 * p;
+    }
+
+    function fmtLoad(x) {
+      const step = parseFloat($("#rounding").value) || 1;
+      const v = roundTo(x, step);
+      const u = $("#unit").value;
+      return Number.isFinite(v) ? v.toFixed(1) + " " + u : "—";
+    }
+
+    function compute() {
+      const lifted = parseFloat($("#lifted").value);
+      const reps = parseInt($("#reps").value);
+
+      if (!lifted || !reps) throw new Error("Informe carga e reps.");
+      const oneRM = brzycki1RM(lifted, reps);
+      if (!Number.isFinite(oneRM)) throw new Error("Reps fora de intervalo válido para Brzycki.");
+
+      const pct = parseFloat($("#targetPct").value);
+      const repsT = parseInt($("#targetReps").value);
+      let target = null;
+
+      if (pct) {
+        target = oneRM * (pct / 100);
+      } else if (repsT) {
+        target = oneRM * pctFromReps(repsT);
+      }
+
+      const tbody = $("#tableZones tbody");
+      tbody.innerHTML = "";
+
+      const unit = $("#unit").value;
+      const step = parseFloat($("#rounding").value) || 1;
+
+      for (let p = 100; p >= 50; p -= 5) {
+        const perc = p / 100;
         let rEst = Math.round(Math.max(1, Math.min(20, repsFromPct(perc))));
-        const w = roundTo(oneRM*perc, step);
-        const tr=document.createElement('tr');
+        const w = roundTo(oneRM * perc, step);
+        const tr = document.createElement("tr");
         tr.innerHTML = `<td>${p}%</td><td>${rEst}</td><td>${w.toFixed(1)} ${unit}</td>`;
         tbody.appendChild(tr);
       }
 
-      return {oneRM,target};
+      return { oneRM, target };
     }
 
-    function render(res){
-      $('#oneRM').textContent=res?fmtLoad(res.oneRM):'—';
-      $('#targetLoad').textContent=res&&res.target?fmtLoad(res.target):'—';
+    function render(res) {
+      $("#oneRM").textContent = res ? fmtLoad(res.oneRM) : "—";
+      $("#targetLoad").textContent = res && res.target ? fmtLoad(res.target) : "—";
     }
 
-    function setMsg(t,o=false){
-      const e=$('#msg');
-      e.textContent=t||'';
-      e.className='tiny '+(o?'ok':'warn');
+    function setMsg(text, ok = false) {
+      const el = $("#msg");
+      el.textContent = text || "";
+      el.className = "tiny " + (ok ? "ok" : "warn");
     }
 
-    $('#calcBtn').addEventListener('click',()=>{
-      try{
-        const r=compute();
+    $("#calcBtn").addEventListener("click", () => {
+      try {
+        const r = compute();
         render(r);
-        setMsg('Cálculo concluído.',true);
-      }catch(e){
+        setMsg("Cálculo concluído.", true);
+      } catch (e) {
         render(null);
-        setMsg(e.message,false);
+        setMsg(e.message, false);
       }
     });
 
-    $('#resetBtn').addEventListener('click',()=>{
-      document.querySelectorAll('input').forEach(i=>i.value='');
-      $('#tableZones tbody').innerHTML='';
+    $("#resetBtn").addEventListener("click", () => {
+      document.querySelectorAll("input").forEach((i) => (i.value = ""));
+      $("#tableZones tbody").innerHTML = "";
       render(null);
-      setMsg('');
+      setMsg("");
     });
 
-    $('#copyBtn').addEventListener('click',()=>{
-      const t=`Brzycki — ${new Date().toLocaleDateString('pt-BR')}\n1RM: ${$('#oneRM').textContent}\nAlvo: ${$('#targetLoad').textContent}`;
-      navigator.clipboard?.writeText(t)
-        .then(()=>setMsg('Copiado.',true))
-        .catch(()=>setMsg('Erro ao copiar.'));
+    $("#copyBtn").addEventListener("click", () => {
+      const t = `Brzycki — ${new Date().toLocaleDateString("pt-BR")}
+1RM: ${$("#oneRM").textContent}
+Alvo: ${$("#targetLoad").textContent}`;
+      navigator.clipboard
+        ?.writeText(t)
+        .then(() => setMsg("Copiado para a área de transferência.", true))
+        .catch(() => setMsg("Erro ao copiar.", false));
     });
-  </script>
-</body>
-</html>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div>
-            <label for="lifted">Carga levantada (unidade)</label>
-            <input id="lifted" type="number" min="1" step="0.5" placeholder="100">
-          </div>
-          <div>
-            <label for="reps">Reps realizadas</label>
-            <input id="reps" type="number" min="1" max="20" step="1" placeholder="6">
-          </div>
-        </div>
-        <div class="tiny">Fórmula de Brzycki: <code>1RM = Peso × 36 / (37 − reps)</code>. Precisão ideal até ~10–12 reps.</div>
-        <div class="actions">
-          <button class="primary" id="calcBtn">Calcular</button>
-          <button id="resetBtn">Limpar</button>
-          <button id="copyBtn">Copiar resumo</button>
-        </div>
-        <div id="msg" class="tiny"></div>
-      </section>
-
-      <aside class="card">
-        <h2>Resultados</h2>
-        <div class="kpi"><div>1RM estimado</div><div class="v" id="oneRM">—</div></div>
-        <div class="kpi"><div>Carga para o alvo</div><div class="v" id="targetLoad">—</div></div>
-        <div class="row">
-          <div>
-            <label for="targetPct">Alvo por % do 1RM</label>
-            <input id="targetPct" type="number" min="30" max="100" step="1" placeholder="80">
-          </div>
-          <div>
-            <label for="targetReps">Alvo por reps</label>
-            <input id="targetReps" type="number" min="1" max="20" step="1" placeholder="5">
-          </div>
-        </div>
-        <div class="tiny">Preencha % ou reps para ver a carga sugerida (usa Brzycki para converter reps→% e vice‑versa).</div>
-        <div class="sep"></div>
-        <h2>Tabela por zonas</h2>
-        <div style="max-height:360px;overflow:auto">
-          <table id="tableZones">
-            <thead><tr><th>% 1RM</th><th>Reps estimadas</th><th>Carga</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <script>
-    const $ = (q)=>document.querySelector(q);
-
-    function roundTo(x, step){ return Math.round(x/step)*step; }
-    function brzycki1RM(w, r){ if(r<=0 || r>=37) return NaN; return w * 36 / (37 - r); }
-    function pctFromReps(r){ return (37 - r)/36; }
-    function repsFromPct(p){ return 37 - 36*p; }
-
-    function fmtLoad(x){ const step=parseFloat($('#rounding').value)||1; const v=roundTo(x,step); const u=$('#unit').value; return Number.isFinite(v)? v.toFixed(1)+' '+u:'—'; }
-
-    function compute(){
-      const lifted=parseFloat($('#lifted').value); const reps=parseInt($('#reps').value);
-      if(!lifted||!reps) throw new Error('Informe carga e reps.');
-      const oneRM=brzycki1RM(lifted,reps);
-      if(!Number.isFinite(oneRM)) throw new Error('Reps fora de intervalo válido.');
-
-      // alvo (opcional)
-      const pct=parseFloat($('#targetPct').value); const repsT=parseInt($('#targetReps').value);
-      let target=null; if(pct) target=oneRM*(pct/100); else if(repsT) target=oneRM*pctFromReps(repsT);
-
-      // Tabela por zonas de %1RM
-      const tbody=$('#tableZones tbody'); tbody.innerHTML='';
-      const unit=$('#unit').value; const step=parseFloat($('#rounding').value)||1;
-      for(let p=100; p>=50; p-=5){
-        const perc = p/100;
-        let rEst = Math.round(Math.max(1, Math.min(20, repsFromPct(perc))));
-        const w = roundTo(oneRM*perc, step);
-        const tr=document.createElement('tr');
-        tr.innerHTML = `<td>${p}%</td><td>${rEst}</td><td>${w.toFixed(1)} ${unit}</td>`;
-        tbody.appendChild(tr);
-      }
-
-      return {oneRM,target};
-    }
-
-    function render(res){ $('#oneRM').textContent=res?fmtLoad(res.oneRM):'—'; $('#targetLoad').textContent=res&&res.target?fmtLoad(res.target):'—'; }
-    function setMsg(t,o=false){const e=$('#msg');e.textContent=t||'';e.className='tiny '+(o?'ok':'warn');}
-
-    $('#calcBtn').addEventListener('click',()=>{try{const r=compute();render(r);setMsg('Cálculo concluído.',true);}catch(e){render(null);setMsg(e.message,false);}});
-    $('#resetBtn').addEventListener('click',()=>{document.querySelectorAll('input').forEach(i=>i.value='');$('#tableZones tbody').innerHTML='';render(null);setMsg('');});
-    $('#copyBtn').addEventListener('click',()=>{const t=`Brzycki — ${new Date().toLocaleDateString('pt-BR')}\n1RM: ${$('#oneRM').textContent}\nAlvo: ${$('#targetLoad').textContent}`;navigator.clipboard?.writeText(t).then(()=>setMsg('Copiado.',true)).catch(()=>setMsg('Erro ao copiar.'));});
   </script>
 </body>
 </html>
