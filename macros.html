@@ -13,69 +13,176 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  background:linear-gradient(180deg,#0b0c10 0%,#0e1116 100%); color:var(--ink);
+  margin:0;
+  font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:radial-gradient(circle at top left,#111827 0,#020617 55%);
+  color:var(--ink);
+  display:flex;
+  justify-content:center;
+  padding:16px;
 }
-.wrapper{max-width:1160px;margin:28px auto;padding:0 16px}
+
+/* CONTAINER ESTILO "APP" (igual vibe da Brzycki) */
+.wrapper{
+  width:100%;
+  max-width:960px;
+  background:var(--panel);
+  border-radius:18px;
+  padding:18px;
+  border:1px solid #1f2937;
+  box-shadow:0 18px 40px rgba(0,0,0,.6);
+}
+@media (max-width:700px){
+  .wrapper{
+    padding:14px;
+    border-radius:14px;
+  }
+}
+
 header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
-.logo{width:44px;height:44px;border-radius:12px;overflow:hidden;background:#fff}
+.logo{width:44px;height:44px;border-radius:12px;overflow:hidden;background:#fff;flex-shrink:0}
 .logo img{width:100%;height:100%;object-fit:contain}
-h1{margin:0;font-size:clamp(18px,3vw,28px);letter-spacing:.2px}
-.sub{color:var(--muted);font-size:13px;margin-top:2px}
-.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
-@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+h1{margin:0;font-size:clamp(18px,3vw,26px);letter-spacing:.2px}
+.sub{color:var(--muted);font-size:12px;margin-top:2px}
+
+/* GRID PRINCIPAL */
+.grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:16px;
+}
+@media (max-width:780px){
+  .grid{grid-template-columns:1fr}
+  header{flex-direction:column;align-items:flex-start}
+}
+
+/* CARTÕES */
 .card{
   background:linear-gradient(180deg,#151922 0%, #0f141c 100%);
   border:1px solid var(--line); border-radius:var(--radius); padding:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25)
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
-.card h2{margin:0 0 10px;font-size:18px}
+@media (max-width:600px){
+  .card{
+    border-radius:14px;
+    padding:14px;
+    box-shadow:none;
+  }
+}
+
+.card h2{margin:0 0 10px;font-size:16px}
+
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:860px){.row{grid-template-columns:1fr}}
+
 label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 input,select,button{font-family:inherit}
 input,select{
   width:100%; padding:12px; border-radius:12px; border:1px solid #273040;
-  background:var(--panel2); color:var(--ink); outline:none
+  background:var(--panel2); color:var(--ink); outline:none;
+  font-size:14px;
 }
 input[type="range"]{padding:0}
-input:focus,select:focus{border-color:var(--accent)}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 1px rgba(249,115,22,.3)}
+
 .small{font-size:12px;color:var(--muted)}
+
 .kpi{
   display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;
   background:#0e1522;border:1px solid #1f2a3c;margin:8px 0
 }
-.kpi .v{font-weight:800}
+.kpi .v{font-weight:800;font-size:18px}
+
 .inline{display:flex;gap:10px;flex-wrap:wrap}
 .btn{
   padding:10px 14px;border:1px solid #2a3548;background:#0f141c;color:#fff;border-radius:12px;
-  cursor:pointer
+  cursor:pointer;font-size:13px;
 }
 .btn:hover{border-color:var(--accent);box-shadow:0 0 0 2px inset rgba(249,115,22,.15)}
 .btn.primary{background:linear-gradient(180deg,#f97316,#fb923c);border-color:#a84d0e;color:#1a1008;font-weight:700}
-.tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+
+.tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px}
 .tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
-.tbl th{background:#0f1524;color:#d7e0ea}
+.tbl th{
+  background:#0f1524;
+  color:#d7e0ea;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-size:11px;
+}
 .tbl tr:nth-child(even){background:#0e1320}
+
 .warn{color:#fff;background:#2b0f13;border:1px solid #5c1b23;padding:10px;border-radius:12px}
 .ok{color:#05210f;background:#0f2d1a;border:1px solid #1f5933;padding:10px;border-radius:12px}
+
 hr{border:none;border-top:1px solid var(--line);margin:14px 0}
 footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
 .hidden{display:none!important}
 .flex-between{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+
+/* TOGGLE */
 .toggle{
   display:inline-flex;gap:6px;background:#0f141c;border:1px solid #273040;border-radius:12px;padding:4px;
 }
 .toggle button{
   border:none;background:transparent;color:#cbd5e1;padding:8px 12px;border-radius:10px;cursor:pointer;
+  font-size:12px;
 }
 .toggle button.active{
   background:linear-gradient(180deg,#f97316,#fb923c);color:#1a1008;font-weight:700;
 }
+
+/* BLOCO DO GRÁFICO DE MACROS */
+.chart-box{
+  margin-top:10px;
+  padding:10px 10px 8px;
+  border-radius:12px;
+  border:1px solid #1f2a3c;
+  background:#020617;
+}
+.chart-box h3{
+  margin:0 0 6px;
+  font-size:14px;
+}
+.chart-wrapper{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+#macroChart{
+  max-width:100%;
+}
+.chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:6px;
+  font-size:11px;
+  color:var(--muted);
+}
+.legend-item{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid #1f2937;
+  background:#020617;
+}
+.legend-dot{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+}
+.legend-p .legend-dot{background:#38bdf8;}   /* Proteína */
+.legend-c .legend-dot{background:#f97316;}   /* Carbo */
+.legend-f .legend-dot{background:#facc15;}   /* Gordura */
+
 @media print{
-  body{background:#fff;color:#000}
+  body{background:#fff;color:#000;padding:0}
+  .wrapper{box-shadow:none;border-color:#ccc;border-radius:0}
   .card{box-shadow:none;border-color:#ccc}
-  .btn,.small,.sub{display:none!important}
+  .btn,.small,.sub,.chart-box,footer{display:none!important}
   a[href]:after{content:""}
 }
 </style>
@@ -83,10 +190,12 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
 <body>
 <div class="wrapper">
   <header>
-    <div class="logo"><img src="Logo fundo branco 01 (1) (1).png" alt="AKT" onerror="this.parentElement.style.display='none'"/></div>
+    <div class="logo">
+      <img src="Logo fundo branco 01 (1) (1).png" alt="AKT" onerror="this.parentElement.style.display='none'"/>
+    </div>
     <div>
       <h1>Calculadora de Macros por Objetivo — AKT Labs</h1>
-      <div class="sub">Realtime (sem botão) · BMR (Katch/Mifflin/Harris) · NEAT · Presets por objetivo · Carb cycling · Fibras · PDF</div>
+      <div class="sub">Realtime (sem botão) · BMR (Katch/Mifflin/Harris) · NEAT · Presets · Carb cycling · Fibras · PDF</div>
     </div>
   </header>
 
@@ -142,14 +251,15 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
           <select id="activity">
             <option value="1.2">Sedentário (sem treino) — 1.20</option>
             <option value="1.375">Levemente ativo (1–2 treinos leves/semana) — 1.375</option>
-            <option value="1.55" selected>Moderado (3–5 treinos regulares/semana) — 1.55</option>
+            <option value="1.55" selected>Moderado (3–5 treinos/semana) — 1.55</option>
             <option value="1.725">Muito ativo (5–6 treinos intensos/semana) — 1.725</option>
             <option value="1.9">Extremamente ativo (atleta/2x ao dia) — 1.90</option>
           </select>
         </div>
         <div>
           <label>NEAT (ajuste fino — movimentos do dia)</label>
-          <input id="neat" type="range" min="-15" max="15" step="1" value="0" oninput="document.getElementById('neatVal').textContent=this.value+'%'"/>
+          <input id="neat" type="range" min="-15" max="15" step="1" value="0"
+                 oninput="document.getElementById('neatVal').textContent=this.value+'%'"/>
           <div class="flex-between"><span>menos movimentação</span><span>mais movimentação</span></div>
           <div class="small">Ajuste atual: <span id="neatVal">0%</span></div>
         </div>
@@ -245,8 +355,25 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
       <div class="kpi"><div>TDEE</div><div class="v"><span id="tdeeOut">—</span> kcal</div></div>
       <div class="kpi"><div>Meta calórica (base)</div><div class="v"><span id="kcalTarget">—</span> kcal</div></div>
 
+      <!-- GRÁFICO DE MACROS (DIA DE TREINO) -->
+      <div class="chart-box">
+        <h3>Distribuição de macros (dia de treino)</h3>
+        <div class="chart-wrapper">
+          <canvas id="macroChart" width="260" height="180"></canvas>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-item legend-p"><span class="legend-dot"></span>Proteína</span>
+          <span class="legend-item legend-c"><span class="legend-dot"></span>Carboidratos</span>
+          <span class="legend-item legend-f"><span class="legend-dot"></span>Gorduras</span>
+        </div>
+      </div>
+
       <table class="tbl" style="margin-top:10px">
-        <thead><tr><th>Dia</th><th>kcal</th><th>Proteína (g)</th><th>Carbo (g)</th><th>Gordura (g)</th><th>Fibra (g)</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Dia</th><th>kcal</th><th>Proteína (g)</th><th>Carbo (g)</th><th>Gordura (g)</th><th>Fibra (g)</th>
+          </tr>
+        </thead>
         <tbody id="macroRows">
           <tr><td>Treino</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           <tr><td>Descanso</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -258,7 +385,10 @@ footer{margin:18px 0 8px;color:#738199;font-size:12px;text-align:center}
         <thead><tr><th>Refeição</th><th>kcal</th><th>P (g)</th><th>C (g)</th><th>G (g)</th></tr></thead>
         <tbody id="mealRowsTrain"></tbody>
       </table>
-      <div class="small" style="margin-top:6px">No modo <b>Avançado</b>, a calculadora concentra ~30% dos carboidratos no <b>pré</b> e ~40% no <b>pós-treino</b>. O restante é dividido igualmente nas demais refeições.</div>
+      <div class="small" style="margin-top:6px">
+        No modo <b>Avançado</b>, a calculadora concentra ~30% dos carboidratos no <b>pré</b> e ~40% no <b>pós-treino</b>.
+        O restante é dividido igualmente nas demais refeições.
+      </div>
     </aside>
   </div>
 
@@ -305,6 +435,67 @@ function fiberTarget(kcal, mode){
   if(per){ const g = kcal/1000*per; return {min:Math.round(g), max:Math.round(g)}; }
   const min = kcal/1000*10, max = kcal/1000*14;
   return {min:Math.round(min), max:Math.round(max)};
+}
+
+/* ---- GRÁFICO DE MACROS (DIA DE TREINO) ---- */
+let macroChartCtx = null;
+function initMacroChart(){
+  const canvas = document.getElementById('macroChart');
+  if(!canvas) return;
+  macroChartCtx = canvas.getContext('2d');
+}
+function drawMacroChart(pGrams, cGrams, fGrams){
+  if(!macroChartCtx) return;
+  const ctx = macroChartCtx;
+  const canvas = ctx.canvas;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const kcalP = pGrams*4;
+  const kcalC = cGrams*4;
+  const kcalF = fGrams*9;
+  const total = kcalP + kcalC + kcalF;
+  if(!isFinite(total) || total<=0) return;
+
+  const data = [
+    {value:kcalP, color:'#38bdf8'},  // Proteína
+    {value:kcalC, color:'#f97316'},  // Carbo
+    {value:kcalF, color:'#facc15'}   // Gordura
+  ];
+
+  const cx = canvas.width/2;
+  const cy = canvas.height/2;
+  const radius = Math.min(cx,cy) - 8;
+  let start = -Math.PI/2;
+
+  data.forEach(d=>{
+    const angle = (d.value/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,radius,start,start+angle);
+    ctx.closePath();
+    ctx.fillStyle = d.color;
+    ctx.fill();
+    start += angle;
+  });
+
+  // Donut
+  ctx.beginPath();
+  ctx.arc(cx,cy,radius*0.55,0,Math.PI*2);
+  ctx.fillStyle = '#020617';
+  ctx.fill();
+
+  // Percentuais
+  const percP = Math.round(kcalP/total*100);
+  const percC = Math.round(kcalC/total*100);
+  const percF = 100 - percP - percC;
+
+  ctx.fillStyle = '#e5e7eb';
+  ctx.font = '12px system-ui, -apple-system, BlinkMacSystemFont';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`${percP}% P`, cx, cy-16);
+  ctx.fillText(`${percC}% C`, cx, cy);
+  ctx.fillText(`${percF}% G`, cx, cy+16);
 }
 
 function calculate(){
@@ -478,6 +669,9 @@ function calculate(){
     tb.appendChild(tr);
   }
 
+  // Atualiza gráfico com macros do dia de treino
+  drawMacroChart(P, C_train, F_train);
+
   const alerts = [];
   if(F < 0.6*weight) alerts.push('Gordura ficou abaixo de 0,6 g/kg (ajuste feito automaticamente).');
   if(P < 1.6*weight) alerts.push('Proteína ficou abaixo de 1,6 g/kg (ajuste feito automaticamente).');
@@ -566,6 +760,8 @@ function attachRealtime(){
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
+  initMacroChart();
+
   document.getElementById('neatVal').textContent=(document.getElementById('neat').value||0)+'%';
   const g = document.getElementById('goal').value;
   const kg = defaultRateKg(g);
