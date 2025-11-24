@@ -40,6 +40,20 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Visual separado por dia */
+
+    body.day-treino {
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      --accent: #f97316;
+      --accent-soft: #fb923c33;
+    }
+
+    body.day-off {
+      background: radial-gradient(circle at top, #020617 0, #0f172a 55%);
+      --accent: #38bdf8;
+      --accent-soft: #38bdf833;
+    }
+
     .page-shell {
       min-height: 100vh;
       display: flex;
@@ -101,8 +115,17 @@
     }
 
     .brand-text span {
+      display: block;
       font-size: 11px;
       color: var(--text-muted);
+    }
+
+    .brand-day-tag {
+      font-size: 11px;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
     }
 
     .header-actions {
@@ -292,6 +315,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
     }
 
     .panel-title span.dot {
@@ -300,6 +324,17 @@
       border-radius: 999px;
       background: var(--accent);
       box-shadow: 0 0 10px rgba(249, 115, 22, 0.7);
+    }
+
+    .badge-day {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      background: rgba(15, 23, 42, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
     }
 
     .panel-body {
@@ -555,6 +590,11 @@
       font-size: 12px;
     }
 
+    .pill-btn.small {
+      padding: 2px 6px;
+      font-size: 10px;
+    }
+
     .meal-notes {
       margin-top: 4px;
     }
@@ -592,6 +632,24 @@
       );
       margin: 4px 0 0;
       opacity: 0.7;
+    }
+
+    /* Substituições exibidas na linha do alimento */
+    .food-substitutions {
+      margin-top: 3px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+
+    .food-sub-pill {
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.6);
+      padding: 1px 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+      white-space: nowrap;
     }
 
     /* Modal de substituições */
@@ -696,7 +754,7 @@
 
     .chip.active {
       border-color: var(--accent);
-      background: rgba(249, 115, 22, 0.12);
+      background: var(--accent-soft);
       color: var(--accent);
     }
 
@@ -727,6 +785,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .group-label {
@@ -734,6 +793,13 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-muted);
+    }
+
+    .group-header-right {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .group-badge {
@@ -883,6 +949,7 @@
         <div class="brand-text">
           <h1>Montador de Dietas</h1>
           <span>Planner local com substituições inteligentes</span>
+          <span id="brandDayTag" class="brand-day-tag">Versão: Dia de Treino</span>
         </div>
       </div>
 
@@ -968,6 +1035,7 @@
         <div class="panel-header">
           <div class="panel-title">
             <span class="dot"></span> Refeições do plano
+            <span id="planDayBadge" class="badge-day">Dia de Treino</span>
           </div>
           <button class="btn btn-outline" id="addMealBtn">
             <span class="icon">➕</span> Adicionar refeição
@@ -976,8 +1044,8 @@
         <div class="panel-body">
           <div class="meals-header">
             <div class="hint">
-              Monte as refeições, adicione alimentos, escolha a categoria (carbo, proteína, fruta, gordura)
-              e use <strong>Substituições</strong> para puxar equivalentes pré-definidos.
+              Monte as refeições do <strong>dia selecionado</strong>, adicione alimentos, escolha a categoria (carbo, proteína, fruta, gordura)
+              e use <strong>Substituições</strong> para salvar equivalentes como opções daquele alimento.
             </div>
           </div>
           <div class="meals-list" id="mealsList"></div>
@@ -985,9 +1053,9 @@
           <div class="notes-footer">
             <div class="field-group">
               <label class="field-label" for="generalNotes">
-                Observações gerais do plano
+                Observações gerais do plano (deste dia)
               </label>
-              <textarea id="generalNotes" placeholder="Orientações gerais, regras, estratégia do protocolo, ajustes finos..."></textarea>
+              <textarea id="generalNotes" placeholder="Orientações gerais, regras, estratégia do protocolo para este dia específico..."></textarea>
             </div>
           </div>
         </div>
@@ -1003,7 +1071,7 @@
       <div>
         <div class="modal-title">Substituições</div>
         <div class="modal-subtitle" id="subModalSubtitle">
-          Selecione um equivalente para substituir o alimento selecionado.
+          Selecione porções ou alimentos para adicionar como opções ao alimento selecionado.
         </div>
       </div>
       <button class="modal-close" type="button" id="subModalClose">✕</button>
@@ -1022,7 +1090,10 @@
       </div>
     </div>
     <div class="modal-footer">
-      <small>Clique em uma opção para aplicá-la ao alimento escolhido.</small>
+      <small>
+        • Clique em <strong>Usar porção inteira</strong> para adicionar todas as opções do grupo<br>
+        • Clique em um alimento específico para adicionar só aquela opção
+      </small>
     </div>
   </div>
 </div>
@@ -1716,7 +1787,7 @@
   // ==========================
   // ESTADO DO APP
   // ==========================
-  const STORAGE_KEY = "akt_diet_planner_v1";
+  const STORAGE_KEY = "akt_diet_planner_v2";
 
   let state = {
     client: {
@@ -1730,10 +1801,16 @@
       fontFamily: "system",
       fontSize: 14
     },
-    notes: {
-      general: ""
-    },
-    meals: []
+    plans: {
+      treino: {
+        notes: { general: "" },
+        meals: []
+      },
+      off: {
+        notes: { general: "" },
+        meals: []
+      }
+    }
   };
 
   let currentFoodForSub = null; // { mealId, foodId, category }
@@ -1755,8 +1832,23 @@
       quantity: "",
       unit: "g",
       category: "carbs",
-      notes: ""
+      notes: "",
+      substitutions: [] // opções de substituição
     };
+  }
+
+  function getActivePlan() {
+    const type = state.client.dayType || "treino";
+    if (!state.plans) {
+      state.plans = {
+        treino: { notes: { general: "" }, meals: [] },
+        off: { notes: { general: "" }, meals: [] }
+      };
+    }
+    if (!state.plans[type]) {
+      state.plans[type] = { notes: { general: "" }, meals: [] };
+    }
+    return state.plans[type];
   }
 
   function saveState() {
@@ -1772,9 +1864,52 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        state = parsed;
+      if (!parsed || typeof parsed !== "object") return;
+      state = parsed;
+
+      // Migração de versões antigas (se existirem)
+      if (!state.plans) {
+        const oldMeals = state.meals || [];
+        const oldNotes = state.notes || { general: "" };
+        state.plans = {
+          treino: { meals: oldMeals, notes: oldNotes },
+          off: { meals: [], notes: { general: "" } }
+        };
+        delete state.meals;
+        delete state.notes;
       }
+      if (!state.plans.treino) {
+        state.plans.treino = { meals: [], notes: { general: "" } };
+      }
+      if (!state.plans.off) {
+        state.plans.off = { meals: [], notes: { general: "" } };
+      }
+      if (!state.client) {
+        state.client = {
+          name: "",
+          goal: "",
+          weight: "",
+          calories: "",
+          dayType: "treino"
+        };
+      }
+      if (!state.client.dayType) {
+        state.client.dayType = "treino";
+      }
+      if (!state.settings) {
+        state.settings = { fontFamily: "system", fontSize: 14 };
+      }
+
+      // migra cada alimento para garantir substitutions
+      Object.values(state.plans).forEach((plan) => {
+        (plan.meals || []).forEach((meal) => {
+          (meal.foods || []).forEach((food) => {
+            if (!Array.isArray(food.substitutions)) {
+              food.substitutions = [];
+            }
+          });
+        });
+      });
     } catch (e) {
       console.error("Erro ao carregar do localStorage", e);
     }
@@ -1784,14 +1919,35 @@
   // RENDERIZAÇÃO
   // ==========================
   function render() {
+    // body classes pelo tipo de dia
+    document.body.classList.toggle("day-treino", state.client.dayType === "treino");
+    document.body.classList.toggle("day-off", state.client.dayType === "off");
+
+    const brandDayTag = document.getElementById("brandDayTag");
+    if (brandDayTag) {
+      brandDayTag.textContent =
+        state.client.dayType === "treino"
+          ? "Versão: Dia de Treino"
+          : "Versão: Dia Off (descanso)";
+    }
+
+    const planDayBadge = document.getElementById("planDayBadge");
+    if (planDayBadge) {
+      planDayBadge.textContent =
+        state.client.dayType === "treino" ? "Dia de Treino" : "Dia Off";
+    }
+
+    const activePlan = getActivePlan();
+
     // dados cliente
     document.getElementById("clientName").value = state.client.name || "";
     document.getElementById("clientGoal").value = state.client.goal || "";
     document.getElementById("clientWeight").value = state.client.weight || "";
     document.getElementById("clientCalories").value = state.client.calories || "";
-    document.getElementById("generalNotes").value = state.notes.general || "";
+    document.getElementById("generalNotes").value =
+      (activePlan.notes && activePlan.notes.general) || "";
 
-    // day type
+    // day type toggle
     const toggleButtons = document.querySelectorAll(
       "#dayTypeToggle .toggle-chip"
     );
@@ -1815,7 +1971,9 @@
     const mealsList = document.getElementById("mealsList");
     mealsList.innerHTML = "";
 
-    state.meals.forEach((meal, idx) => {
+    const meals = activePlan.meals || [];
+
+    meals.forEach((meal, idx) => {
       const mealCard = document.createElement("div");
       mealCard.className = "meal-card";
       mealCard.dataset.mealId = meal.id;
@@ -1888,36 +2046,39 @@
 
       const tbody = foodsTable.querySelector("tbody");
 
-      meal.foods.forEach((food) => {
+      (meal.foods || []).forEach((food) => {
+        if (!Array.isArray(food.substitutions)) {
+          food.substitutions = [];
+        }
+
+        const subsHtml = food.substitutions.length
+          ? `<div class="food-substitutions">
+               ${food.substitutions
+                 .map((s) => `<span class="food-sub-pill">${s}</span>`)
+                 .join("")}
+             </div>`
+          : `<div class="food-substitutions"></div>`;
+
         const tr = document.createElement("tr");
         tr.dataset.foodId = food.id;
         tr.innerHTML = `
           <td>
             <input type="text" class="food-input food-name" placeholder="Ex: Arroz, Frango, Banana..."
               value="${food.name || ""}">
+            ${subsHtml}
           </td>
           <td style="width:70px;">
             <input type="number" class="food-input food-qty" min="0" step="1" value="${food.quantity || ""}">
           </td>
           <td style="width:70px;">
-            <input type="text" class="food-input food-unit" value="${
-              food.unit || "g"
-            }">
+            <input type="text" class="food-input food-unit" value="${food.unit || "g"}">
           </td>
           <td style="width:100px;">
             <select class="food-category">
-              <option value="carbs"${
-                food.category === "carbs" ? " selected" : ""
-              }>Carbo</option>
-              <option value="proteins"${
-                food.category === "proteins" ? " selected" : ""
-              }>Proteína</option>
-              <option value="fruits"${
-                food.category === "fruits" ? " selected" : ""
-              }>Fruta</option>
-              <option value="fats"${
-                food.category === "fats" ? " selected" : ""
-              }>Gordura</option>
+              <option value="carbs"${food.category === "carbs" ? " selected" : ""}>Carbo</option>
+              <option value="proteins"${food.category === "proteins" ? " selected" : ""}>Proteína</option>
+              <option value="fruits"${food.category === "fruits" ? " selected" : ""}>Fruta</option>
+              <option value="fats"${food.category === "fats" ? " selected" : ""}>Gordura</option>
             </select>
           </td>
           <td style="min-width:160px;">
@@ -1955,9 +2116,7 @@
           <label class="field-label">
             Observações da refeição
           </label>
-          <textarea class="meal-notes-input" placeholder="Instruções específicas desta refeição, timing, ajustes...">${
-            meal.notes || ""
-          }</textarea>
+          <textarea class="meal-notes-input" placeholder="Instruções específicas desta refeição, timing, ajustes...">${meal.notes || ""}</textarea>
         </div>
         <div class="divider"></div>
       `;
@@ -1970,12 +2129,12 @@
       mealsList.appendChild(mealCard);
     });
 
-    if (state.meals.length === 0) {
+    if (meals.length === 0) {
       const empty = document.createElement("div");
       empty.className = "helper-row";
       empty.style.justifyContent = "flex-start";
       empty.innerHTML =
-        "<small>Nenhuma refeição ainda. Clique em <strong>Adicionar refeição</strong> para começar.</small>";
+        "<small>Nenhuma refeição ainda para este dia. Clique em <strong>Adicionar refeição</strong> para começar.</small>";
       document.getElementById("mealsList").appendChild(empty);
     }
   }
@@ -2014,8 +2173,8 @@
     const subtitle = document.getElementById("subModalSubtitle");
     subtitle.textContent =
       "Categoria atual: " +
-      (categoryLabel(currentFoodForSub.category)) +
-      ". Clique em uma opção para aplicar.";
+      categoryLabel(currentFoodForSub.category) +
+      ". Adicione porções inteiras ou alimentos específicos como opções.";
     subModalBackdrop.classList.add("open");
   }
 
@@ -2039,6 +2198,44 @@
     }
   }
 
+  function ensureFoodForSub() {
+    if (!currentFoodForSub) return null;
+    const { mealId, foodId } = currentFoodForSub;
+    const plan = getActivePlan();
+    const meal = plan.meals.find((m) => m.id === mealId);
+    if (!meal) return null;
+    const food = meal.foods.find((f) => f.id === foodId);
+    if (!food) return null;
+    if (!Array.isArray(food.substitutions)) {
+      food.substitutions = [];
+    }
+    return { plan, meal, food };
+  }
+
+  function addSubstitutionOption(eq) {
+    const ctx = ensureFoodForSub();
+    if (!ctx) return;
+    const { food } = ctx;
+    if (!food.substitutions.includes(eq)) {
+      food.substitutions.push(eq);
+      saveState();
+      render();
+    }
+  }
+
+  function addSubstitutionGroup(equivalents) {
+    const ctx = ensureFoodForSub();
+    if (!ctx) return;
+    const { food } = ctx;
+    equivalents.forEach((eq) => {
+      if (!food.substitutions.includes(eq)) {
+        food.substitutions.push(eq);
+      }
+    });
+    saveState();
+    render();
+  }
+
   function renderSubstitutionGroups(category) {
     subGroupsList.innerHTML = "";
     const groups = substitutionBank[category] || [];
@@ -2048,14 +2245,31 @@
 
       const header = document.createElement("div");
       header.className = "group-header";
+
       const label = document.createElement("div");
       label.className = "group-label";
       label.textContent = group.label;
+
+      const right = document.createElement("div");
+      right.className = "group-header-right";
+
       const badge = document.createElement("div");
       badge.className = "group-badge";
       badge.textContent = "GRUPO " + (idx + 1);
+
+      const useGroupBtn = document.createElement("button");
+      useGroupBtn.type = "button";
+      useGroupBtn.className = "pill-btn small";
+      useGroupBtn.textContent = "Usar porção inteira";
+      useGroupBtn.addEventListener("click", () => {
+        addSubstitutionGroup(group.equivalents);
+      });
+
+      right.appendChild(badge);
+      right.appendChild(useGroupBtn);
+
       header.appendChild(label);
-      header.appendChild(badge);
+      header.appendChild(right);
 
       const list = document.createElement("div");
       list.className = "equivalents-list";
@@ -2066,7 +2280,7 @@
         pill.className = "equiv-pill";
         pill.textContent = eq;
         pill.addEventListener("click", () => {
-          applySubstitution(eq);
+          addSubstitutionOption(eq);
         });
         list.appendChild(pill);
       });
@@ -2082,31 +2296,34 @@
     }
   }
 
-  function applySubstitution(text) {
-    if (!currentFoodForSub) return;
-    const { mealId, foodId } = currentFoodForSub;
-    const meal = state.meals.find((m) => m.id === mealId);
-    if (!meal) return;
-    const food = meal.foods.find((f) => f.id === foodId);
-    if (!food) return;
-    // Apenas substitui o nome do alimento; quantidade e unidade o coach ajusta
-    food.name = text;
-    saveState();
-    render();
-    closeSubstitutionModal();
-  }
-
   // ==========================
   // EVENTOS
   // ==========================
   document.addEventListener("DOMContentLoaded", () => {
     loadState();
-    if (!state.meals || !Array.isArray(state.meals) || state.meals.length === 0) {
-      const m1 = createMeal();
-      m1.name = "Refeição 1";
-      m1.foods.push(createFood());
-      state.meals.push(m1);
-    }
+
+    // garantir planos básicos para treino e off
+    ["treino", "off"].forEach((type) => {
+      const plan = state.plans[type] || { meals: [], notes: { general: "" } };
+      state.plans[type] = plan;
+      if (!Array.isArray(plan.meals)) plan.meals = [];
+      if (!plan.notes) plan.notes = { general: "" };
+      if (plan.meals.length === 0) {
+        const m1 = createMeal();
+        m1.name = type === "treino" ? "Refeição 1 (Treino)" : "Refeição 1 (Off)";
+        m1.foods.push(createFood());
+        plan.meals.push(m1);
+      } else {
+        // garantir substitutions em alimentos existentes
+        plan.meals.forEach((meal) => {
+          (meal.foods || []).forEach((food) => {
+            if (!Array.isArray(food.substitutions)) {
+              food.substitutions = [];
+            }
+          });
+        });
+      }
+    });
 
     if (!state.settings || typeof state.settings !== "object") {
       state.settings = { fontFamily: "system", fontSize: 14 };
@@ -2136,7 +2353,8 @@
     });
 
     document.getElementById("generalNotes").addEventListener("input", (e) => {
-      state.notes.general = e.target.value;
+      const plan = getActivePlan();
+      plan.notes.general = e.target.value;
       saveState();
     });
 
@@ -2185,10 +2403,10 @@
       saveState();
     });
 
-    // Botão novo plano
+    // Botão novo plano (zera treino e off)
     document.getElementById("newPlanBtn").addEventListener("click", () => {
       const ok = confirm(
-        "Tem certeza que deseja iniciar um novo plano? Isso limpa todas as refeições e observações salvas."
+        "Tem certeza que deseja iniciar um novo plano? Isso limpa as refeições e observações de DIA DE TREINO e DIA OFF."
       );
       if (!ok) return;
 
@@ -2199,12 +2417,18 @@
         calories: "",
         dayType: state.client.dayType || "treino"
       };
-      state.notes = { general: "" };
-      state.meals = [];
+
+      state.plans = {
+        treino: { notes: { general: "" }, meals: [] },
+        off: { notes: { general: "" }, meals: [] }
+      };
+
+      const activePlan = getActivePlan();
       const m1 = createMeal();
       m1.name = "Refeição 1";
       m1.foods.push(createFood());
-      state.meals.push(m1);
+      activePlan.meals.push(m1);
+
       saveState();
       render();
     });
@@ -2212,43 +2436,45 @@
     // Salvar manual
     document.getElementById("saveBtn").addEventListener("click", () => {
       saveState();
-      alert("Plano salvo localmente neste navegador.");
+      alert("Plano salvo localmente neste navegador (inclui dias de treino e off).");
     });
 
     // PDF
     document.getElementById("pdfBtn").addEventListener("click", () => {
-      // garante estado atualizado pelos inputs antes de imprimir
       saveState();
       window.print();
     });
 
-    // Adicionar refeição
+    // Adicionar refeição (no dia ativo)
     document.getElementById("addMealBtn").addEventListener("click", () => {
+      const plan = getActivePlan();
       const meal = createMeal();
-      meal.name = "Refeição " + (state.meals.length + 1);
+      meal.name =
+        "Refeição " + (plan.meals.length + 1) +
+        (state.client.dayType === "treino" ? " (Treino)" : " (Off)");
       meal.foods.push(createFood());
-      state.meals.push(meal);
+      plan.meals.push(meal);
       saveState();
       render();
     });
 
     // Delegação de eventos nas refeições/alimentos
     document.getElementById("mealsList").addEventListener("click", (e) => {
-      const mealsList = document.getElementById("mealsList");
       const mealCard = e.target.closest(".meal-card");
       if (!mealCard) return;
+      const plan = getActivePlan();
       const mealId = mealCard.dataset.mealId;
-      const mealIndex = state.meals.findIndex((m) => m.id === mealId);
+      const mealIndex = plan.meals.findIndex((m) => m.id === mealId);
       if (mealIndex === -1) return;
 
-      const meal = state.meals[mealIndex];
+      const meal = plan.meals[mealIndex];
 
       // mover para cima
       if (e.target.closest(".move-up")) {
         if (mealIndex > 0) {
-          const tmp = state.meals[mealIndex - 1];
-          state.meals[mealIndex - 1] = meal;
-          state.meals[mealIndex] = tmp;
+          const tmp = plan.meals[mealIndex - 1];
+          plan.meals[mealIndex - 1] = meal;
+          plan.meals[mealIndex] = tmp;
           saveState();
           render();
         }
@@ -2257,10 +2483,10 @@
 
       // mover para baixo
       if (e.target.closest(".move-down")) {
-        if (mealIndex < state.meals.length - 1) {
-          const tmp = state.meals[mealIndex + 1];
-          state.meals[mealIndex + 1] = meal;
-          state.meals[mealIndex] = tmp;
+        if (mealIndex < plan.meals.length - 1) {
+          const tmp = plan.meals[mealIndex + 1];
+          plan.meals[mealIndex + 1] = meal;
+          plan.meals[mealIndex] = tmp;
           saveState();
           render();
         }
@@ -2269,9 +2495,9 @@
 
       // deletar refeição
       if (e.target.closest(".delete-meal")) {
-        const ok = confirm("Remover esta refeição?");
+        const ok = confirm("Remover esta refeição deste dia?");
         if (!ok) return;
-        state.meals.splice(mealIndex, 1);
+        plan.meals.splice(mealIndex, 1);
         saveState();
         render();
         return;
@@ -2291,6 +2517,10 @@
       const foodId = foodRow.dataset.foodId;
       const food = meal.foods.find((f) => f.id === foodId);
       if (!food) return;
+
+      if (!Array.isArray(food.substitutions)) {
+        food.substitutions = [];
+      }
 
       // deletar alimento
       if (e.target.closest(".delete-food")) {
@@ -2313,8 +2543,9 @@
     document.getElementById("mealsList").addEventListener("input", (e) => {
       const mealCard = e.target.closest(".meal-card");
       if (!mealCard) return;
+      const plan = getActivePlan();
       const mealId = mealCard.dataset.mealId;
-      const meal = state.meals.find((m) => m.id === mealId);
+      const meal = plan.meals.find((m) => m.id === mealId);
       if (!meal) return;
 
       if (e.target.classList.contains("meal-name-input")) {
@@ -2357,8 +2588,9 @@
     document.getElementById("mealsList").addEventListener("change", (e) => {
       const mealCard = e.target.closest(".meal-card");
       if (!mealCard) return;
+      const plan = getActivePlan();
       const mealId = mealCard.dataset.mealId;
-      const meal = state.meals.find((m) => m.id === mealId);
+      const meal = plan.meals.find((m) => m.id === mealId);
       if (!meal) return;
 
       const foodRow = e.target.closest("tr[data-food-id]");
@@ -2390,7 +2622,7 @@
       subtitle.textContent =
         "Categoria atual: " +
         categoryLabel(cat) +
-        ". Clique em uma opção para aplicar.";
+        ". Adicione porções inteiras ou alimentos específicos como opções.";
     });
 
     document
