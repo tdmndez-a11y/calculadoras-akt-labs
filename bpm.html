@@ -1,84 +1,359 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FC de Treino — Homens & Mulheres</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 480px;
-      margin: 2rem auto;
-      padding: 1rem;
-      line-height: 1.5;
-    }
-    label, select, input {
-      display: block;
-      margin: .6rem 0;
-      width: 100%;
-    }
-    .result {
-      margin-top: 1rem;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AKT Labs — FC (Homens & Mulheres) (Mobile)</title>
+<style>
+:root{
+  --bg:#050609; --panel:#10131a; --panel2:#0c1016; --ink:#e8edf2; --muted:#8f9bb0;
+  --accent:#f97316; --line:#1f2733; --warn:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:radial-gradient(circle at top,#111827 0,#020617 55%);
+  color:var(--ink);
+}
+.wrapper{
+  max-width:420px;
+  margin:0 auto;
+  padding:14px 10px 24px;
+}
+header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.logo{
+  width:36px;height:36px;
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+}
+.logo img{
+  width:100%;height:100%;object-fit:contain;
+}
+h1{
+  font-size:17px;
+  line-height:1.25;
+}
+.sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+.card{
+  background:linear-gradient(180deg,#111827 0,#020617 100%);
+  border-radius:14px;
+  border:1px solid #1e293b;
+  padding:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+.card + .card{margin-top:10px}
+.card h2{
+  font-size:15px;
+  margin-bottom:8px;
+}
+.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.row > div{flex:1 1 0}
+label{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+input, select{
+  width:100%;
+  padding:9px 10px;
+  border-radius:10px;
+  border:1px solid #1f2937;
+  background:var(--panel2);
+  color:var(--ink);
+  font-size:13px;
+}
+input[type="range"]{
+  padding:0;
+  -webkit-appearance:none;
+  appearance:none;
+  background:transparent;
+}
+input:focus, select:focus{outline:none;border-color:var(--accent)}
+input[type="range"]::-webkit-slider-runnable-track{
+  height:4px;border-radius:999px;background:#1f2937;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;border-radius:50%;
+  margin-top:-6px;
+  background:var(--accent);
+}
+.small{
+  font-size:11px;
+  color:var(--muted);
+}
+.kpis{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:4px;
+}
+.kpi{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 9px;
+  border-radius:10px;
+  background:#020617;
+  border:1px solid #1f2937;
+  font-size:12px;
+}
+.kpi span.v{
+  font-weight:700;
+  font-size:13px;
+}
+.tbl{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:6px;
+  font-size:11px;
+}
+.tbl th,.tbl td{
+  padding:6px 4px;
+  border-bottom:1px solid #111827;
+}
+.tbl th{
+  text-align:left;
+  color:#d1d5db;
+  background:#020617;
+  position:sticky;
+  top:0;
+}
+.tbl tr:nth-child(even){
+  background:#030712;
+}
+.warn{
+  margin-top:8px;
+  padding:7px 9px;
+  border-radius:10px;
+  border:1px solid #7f1d1d;
+  background:#450a0a;
+  color:#fecaca;
+  font-size:11px;
+}
+footer{
+  margin-top:10px;
+  text-align:center;
+  font-size:10px;
+  color:#6b7280;
+}
+hr{
+  border:none;
+  border-top:1px solid #1f2937;
+  margin:8px 0;
+}
+</style>
 </head>
-
 <body>
-  <h1>Frequência Cardíaca de Treino</h1>
+<div class="wrapper">
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="AKT" onerror="this.parentElement.style.display='none'">
+    </div>
+    <div>
+      <h1>FC de Treino — Homens & Mulheres</h1>
+      <div class="sub" id="formulaSub">—</div>
+    </div>
+  </header>
 
-  <label for="sexo">Sexo</label>
-  <select id="sexo">
-    <option value="mulher">Mulher</option>
-    <option value="homem">Homem</option>
-  </select>
+  <section class="card" id="formRoot">
+    <h2>Entradas</h2>
 
-  <label for="idade">Idade (anos)</label>
-  <input type="number" id="idade" min="1" placeholder="Ex: 30">
+    <div class="row">
+      <div>
+        <label>Sexo</label>
+        <select id="sex">
+          <option value="mulher" selected>Mulher</option>
+          <option value="homem">Homem</option>
+        </select>
+      </div>
+      <div>
+        <label>Idade (anos)</label>
+        <input id="age" type="number" min="10" max="90" value="28">
+      </div>
+    </div>
 
-  <label for="intensidade">Intensidade alvo (%)</label>
-  <input type="number" id="intensidade" min="1" max="100" value="70">
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Intensidade alvo (%)</label>
+        <input id="intensity" type="range" min="40" max="95" step="1" value="70"
+               oninput="document.getElementById('intenVal').textContent=this.value+'%'">
+        <div class="small">Atual: <span id="intenVal">70%</span></div>
+      </div>
+      <div>
+        <label class="small" style="margin-top:2px;">&nbsp;</label>
+        <div class="small" style="padding:9px 10px;border:1px dashed #1f2937;border-radius:10px;background:#050814;">
+          A fórmula é definida automaticamente pelo sexo.
+        </div>
+      </div>
+    </div>
 
-  <button onclick="calcularFC()">Calcular</button>
+    <hr>
 
-  <div class="result" id="saida"></div>
+    <div class="small" id="notes">
+      • Estimativa para adultos saudáveis.<br>
+      • Ajuste pela sua sensação de esforço (RPE).
+    </div>
 
-  <script>
-    function calcularFC() {
-      const sexo = document.getElementById("sexo").value;
-      const idade = parseFloat(document.getElementById("idade").value);
-      const intensidade = parseFloat(document.getElementById("intensidade").value);
+    <div id="alerts"></div>
+  </section>
 
-      if (!idade || idade <= 0 || !intensidade || intensidade <= 0) {
-        document.getElementById("saida").innerText = "Preencha idade e intensidade corretamente!";
-        return;
-      }
+  <section class="card">
+    <h2>Resultados</h2>
 
-      // Fórmulas de FC máxima
-      let fcMax;
-      if (sexo === "mulher") {
-        // Gulati específico pra mulheres: 206 − 0,88 × idade
-        fcMax = 206 - 0.88 * idade;
-      } else {
-        // Fórmula simples pra homens (220 − idade)
-        fcMax = 220 - idade;
-      }
+    <div class="kpis">
+      <div class="kpi">
+        <span>FCmáx estimada (<span id="formulaName">—</span>)</span>
+        <span class="v"><span id="hrmaxOut">—</span> bpm</span>
+      </div>
+      <div class="kpi">
+        <span>Alvo na intensidade atual</span>
+        <span class="v"><span id="targetOut">—</span> bpm</span>
+      </div>
+    </div>
 
-      // Alvo na intensidade atual
-      const alvo = (fcMax * (intensidade / 100)).toFixed(1);
+    <h3 style="margin:10px 0 4px;font-size:13px;">Zonas de treino</h3>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Zona</th>
+          <th>% FCmáx</th>
+          <th>Descrição</th>
+          <th>FC (bpm)</th>
+        </tr>
+      </thead>
+      <tbody id="zoneRows">
+        <tr><td>Z1</td><td>50–60%</td><td>Recuperação</td><td>—</td></tr>
+        <tr><td>Z2</td><td>60–70%</td><td>Base</td><td>—</td></tr>
+        <tr><td>Z3</td><td>70–80%</td><td>Tempo</td><td>—</td></tr>
+        <tr><td>Z4</td><td>80–90%</td><td>Limite</td><td>—</td></tr>
+        <tr><td>Z5</td><td>90–100%</td><td>Anaeróbio</td><td>—</td></tr>
+      </tbody>
+    </table>
 
-      // Output
-      document.getElementById("saida").innerHTML = `
-        FCmáx estimada: <strong>${fcMax.toFixed(1)} bpm</strong><br>
-        FC alvo (${intensidade}%): <strong>${alvo} bpm</strong>
-      `;
-    }
-  </script>
+    <div class="small" style="margin-top:6px;">
+      Regra simples: Z1 conversa fácil · Z2 frases curtas · Z3 frases cortadas · Z4 palavras soltas · Z5 quase sem falar.
+    </div>
+  </section>
 
-  <p style="margin-top: 1.2rem; font-size: .9rem; color: #555;">
-    • Estimativas baseadas em fórmulas comuns de FCmáx para cada sexo. Não substituem avaliação médica.
-  </p>
+  <footer>© AKT Labs — uso educativo, não substitui avaliação médica.</footer>
+</div>
+
+<script>
+const $ = (q)=>document.querySelector(q);
+const round = (v)=>Math.round(v);
+
+// Fórmulas de FCmáx (mantendo as que você já tinha)
+const gulati = age => 206 - 0.88 * age; // foco mulheres
+const fox    = age => 220 - age;        // clássico simples
+
+function targetByPct(hrmax, pct){
+  return hrmax * (pct/100);
+}
+
+function computeZones(hrmax){
+  const bands = [
+    {z:'Z1', lo:50, hi:60, desc:'Recuperação'},
+    {z:'Z2', lo:60, hi:70, desc:'Base / Endurance'},
+    {z:'Z3', lo:70, hi:80, desc:'Tempo'},
+    {z:'Z4', lo:80, hi:90, desc:'Limite'},
+    {z:'Z5', lo:90, hi:100, desc:'Anaeróbio'},
+  ];
+  return bands.map(b=>{
+    const lo = targetByPct(hrmax, b.lo);
+    const hi = targetByPct(hrmax, b.hi);
+    return { ...b, bpm:`${round(lo)}–${round(hi)}` };
+  });
+}
+
+function pickFormula(sex){
+  if(sex === 'mulher'){
+    return {
+      name: 'Gulati',
+      sub: 'Gulati (206 − 0,88×idade) · Zonas por % da FCmáx',
+      fn: gulati
+    };
+  }
+  return {
+    name: 'Fox',
+    sub: 'Fox (220 − idade) · Zonas por % da FCmáx',
+    fn: fox
+  };
+}
+
+function render(){
+  const age = parseInt($('#age').value || 0);
+  const pct = parseInt($('#intensity').value || 70);
+  const sex = ($('#sex').value || 'mulher');
+
+  const formula = pickFormula(sex);
+
+  // Atualiza textos do header/KPI
+  $('#formulaSub').textContent = formula.sub;
+  $('#formulaName').textContent = formula.name;
+
+  const hrmax = formula.fn(age);
+  $('#hrmaxOut').textContent = isFinite(hrmax) ? round(hrmax) : '—';
+
+  const target = targetByPct(hrmax, pct);
+  $('#targetOut').textContent = isFinite(target) ? round(target) : '—';
+
+  // Zonas
+  const zones = computeZones(hrmax);
+  const tb = $('#zoneRows'); tb.innerHTML = '';
+  zones.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.z}</td>
+      <td>${r.lo}–${r.hi}%</td>
+      <td>${r.desc}</td>
+      <td>${r.bpm}</td>
+    `;
+    tb.appendChild(tr);
+  });
+
+  // Alertas (mantendo tua lógica + leve ajuste)
+  const alerts = [];
+  if(age < 16 || age > 75){
+    alerts.push('Idades extremas tornam a estimativa menos precisa. Use como referência, não como verdade absoluta.');
+  }
+  alerts.push('Use junto da sua sensação real de esforço. Em caso de dúvidas ou histórico cardíaco, consulte um médico.');
+
+  $('#alerts').innerHTML = `<div class="warn">${alerts.map(a=>'• '+a).join('<br>')}</div>`;
+}
+
+function debounce(fn, ms){
+  let t;
+  return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); };
+}
+const debounced = debounce(render, 100);
+
+function attach(){
+  const root = document.getElementById('formRoot');
+  root.addEventListener('input', debounced);
+  root.addEventListener('change', debounced);
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  $('#intenVal').textContent = ($('#intensity').value || '70') + '%';
+  attach();
+  render();
+});
+</script>
 </body>
 </html>
