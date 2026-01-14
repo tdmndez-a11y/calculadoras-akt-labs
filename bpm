@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FC de Treino — Homens & Mulheres</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+    label, select, input {
+      display: block;
+      margin: .6rem 0;
+      width: 100%;
+    }
+    .result {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Frequência Cardíaca de Treino</h1>
+
+  <label for="sexo">Sexo</label>
+  <select id="sexo">
+    <option value="mulher">Mulher</option>
+    <option value="homem">Homem</option>
+  </select>
+
+  <label for="idade">Idade (anos)</label>
+  <input type="number" id="idade" min="1" placeholder="Ex: 30">
+
+  <label for="intensidade">Intensidade alvo (%)</label>
+  <input type="number" id="intensidade" min="1" max="100" value="70">
+
+  <button onclick="calcularFC()">Calcular</button>
+
+  <div class="result" id="saida"></div>
+
+  <script>
+    function calcularFC() {
+      const sexo = document.getElementById("sexo").value;
+      const idade = parseFloat(document.getElementById("idade").value);
+      const intensidade = parseFloat(document.getElementById("intensidade").value);
+
+      if (!idade || idade <= 0 || !intensidade || intensidade <= 0) {
+        document.getElementById("saida").innerText = "Preencha idade e intensidade corretamente!";
+        return;
+      }
+
+      // Fórmulas de FC máxima
+      let fcMax;
+      if (sexo === "mulher") {
+        // Gulati específico pra mulheres: 206 − 0,88 × idade
+        fcMax = 206 - 0.88 * idade;
+      } else {
+        // Fórmula simples pra homens (220 − idade)
+        fcMax = 220 - idade;
+      }
+
+      // Alvo na intensidade atual
+      const alvo = (fcMax * (intensidade / 100)).toFixed(1);
+
+      // Output
+      document.getElementById("saida").innerHTML = `
+        FCmáx estimada: <strong>${fcMax.toFixed(1)} bpm</strong><br>
+        FC alvo (${intensidade}%): <strong>${alvo} bpm</strong>
+      `;
+    }
+  </script>
+
+  <p style="margin-top: 1.2rem; font-size: .9rem; color: #555;">
+    • Estimativas baseadas em fórmulas comuns de FCmáx para cada sexo. Não substituem avaliação médica.
+  </p>
+</body>
+</html>
